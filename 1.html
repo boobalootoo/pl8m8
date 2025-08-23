@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balanced Meal Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4; /* Light green background */
+        }
+        
+        /* Custom styles for the kitchen layout and items */
+        .kitchen-container {
+            height: 100vh;
+            display: grid;
+            grid-template-rows: 1fr 2fr;
+            grid-template-columns: 1fr 3fr 1fr;
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .cupboard-door {
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            transform-origin: left;
+        }
+        .cupboard-door.open {
+            transform: rotateY(-90deg);
+        }
+
+        .food-item {
+            cursor: grab;
+            font-size: 2.5rem;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .plate {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+        }
+        .plate-stack .plate:not(:last-child) {
+            margin-top: -60px; /* Overlap plates to create a stack effect */
+        }
+        
+        .plate-food-container {
+            padding: 1rem;
+            min-height: 100px;
+            min-width: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .fridge-door {
+            transform-origin: left;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .fridge-door.open {
+            transform: rotateY(-90deg);
+        }
+
+    </style>
+</head>
+<body class="bg-fuchsia-50 text-slate-800">
+    <div class="p-8">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-center mb-6 text-fuchsia-900 drop-shadow-md">Create Your Balanced Meal</h1>
+        <p class="text-center text-lg md:text-xl text-fuchsia-800 mb-8">Drag a plate from the stack, and then fill it with healthy foods from the cupboards and fridge!</p>
+
+        <div class="kitchen-container grid grid-cols-1 md:grid-cols-5 md:grid-rows-3 gap-6">
+
+            <!-- Kitchen Top: Cupboards -->
+            <div class="md:col-span-3 row-start-1 md:col-start-2 flex items-end justify-center gap-4">
+                <div id="cupboard-1" class="bg-orange-300 w-full h-32 rounded-lg relative overflow-hidden shadow-xl border-4 border-orange-400">
+                    <div id="cupboard-door-1" class="cupboard-door bg-orange-500 w-full h-full rounded-lg absolute inset-0 z-10 flex items-center justify-center border-b-4 border-r-4 border-orange-600" onclick="toggleCupboard(1)">
+                        <span class="text-2xl text-white font-bold tracking-widest drop-shadow-sm">CARBS</span>
+                    </div>
+                    <div class="flex flex-wrap justify-center items-center h-full p-2 gap-4">
+                        <span class="food-item" draggable="true" data-group="Carbs">🍞</span>
+                        <span class="food-item" draggable="true" data-group="Carbs">🍚</span>
+                        <span class="food-item" draggable="true" data-group="Carbs">🍝</span>
+                        <span class="food-item" draggable="true" data-group="Carbs">🥔</span>
+                    </div>
+                </div>
+                <div id="cupboard-2" class="bg-lime-300 w-full h-32 rounded-lg relative overflow-hidden shadow-xl border-4 border-lime-400">
+                    <div id="cupboard-door-2" class="cupboard-door bg-lime-500 w-full h-full rounded-lg absolute inset-0 z-10 flex items-center justify-center border-b-4 border-r-4 border-lime-600" onclick="toggleCupboard(2)">
+                        <span class="text-2xl text-white font-bold tracking-widest drop-shadow-sm">VEGGIES</span>
+                    </div>
+                    <div class="flex flex-wrap justify-center items-center h-full p-2 gap-4">
+                        <span class="food-item" draggable="true" data-group="Veggies">🥗</span>
+                        <span class="food-item" draggable="true" data-group="Veggies">🥦</span>
+                        <span class="food-item" draggable="true" data-group="Veggies">🥕</span>
+                        <span class="food-item" draggable="true" data-group="Veggies">🧅</span>
+                    </div>
+                </div>
+                <div id="cupboard-3" class="bg-rose-300 w-full h-32 rounded-lg relative overflow-hidden shadow-xl border-4 border-rose-400">
+                    <div id="cupboard-door-3" class="cupboard-door bg-rose-500 w-full h-full rounded-lg absolute inset-0 z-10 flex items-center justify-center border-b-4 border-r-4 border-rose-600" onclick="toggleCupboard(3)">
+                        <span class="text-2xl text-white font-bold tracking-widest drop-shadow-sm">FRUITS</span>
+                    </div>
+                    <div class="flex flex-wrap justify-center items-center h-full p-2 gap-4">
+                        <span class="food-item" draggable="true" data-group="Fruits">🍎</span>
+                        <span class="food-item" draggable="true" data-group="Fruits">🍌</span>
+                        <span class="food-item" draggable="true" data-group="Fruits">🍓</span>
+                        <span class="food-item" draggable="true" data-group="Fruits">🍇</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plate Stack -->
+            <div class="row-start-2 md:col-start-1 flex flex-col justify-end items-center mb-10 md:mb-0">
+                <div id="plate-stack" class="flex flex-col items-center">
+                    <div class="plate plate-stack-item cursor-grab shadow-xl bg-slate-100" draggable="true" data-plate="true" id="plate-4"></div>
+                    <div class="plate plate-stack-item cursor-grab shadow-xl bg-slate-100" draggable="true" data-plate="true" id="plate-3"></div>
+                    <div class="plate plate-stack-item cursor-grab shadow-xl bg-slate-100" draggable="true" data-plate="true" id="plate-2"></div>
+                    <div class="plate plate-stack-item cursor-grab shadow-xl bg-slate-100" draggable="true" data-plate="true" id="plate-1"></div>
+                </div>
+                <h4 class="text-xl font-bold mt-4 text-slate-700">Plates</h4>
+            </div>
+
+            <!-- Table Drop Zone -->
+            <div id="table" class="md:col-span-3 md:col-start-2 md:row-span-2 row-start-2 bg-amber-900 border-b-8 border-r-8 border-amber-800 rounded-lg p-8 shadow-inner flex flex-wrap justify-center items-start gap-12 relative overflow-hidden">
+                <div class="absolute inset-0 bg-repeat bg-center opacity-10" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'10\'><rect width=\'10\' height=\'10\' fill=\'%23a16207\'/><path d=\'M 0 0 L 10 10 M 10 0 L 0 10\' stroke=\'%2392400e\' stroke-width=\'1\'/></svg>');"></div>
+                <p class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl text-amber-50 font-bold opacity-30">Drag a plate here to begin!</p>
+            </div>
+
+            <!-- Fridge -->
+            <div class="row-start-3 md:row-start-2 md:col-start-5 bg-blue-300 w-full h-full rounded-lg relative overflow-hidden shadow-xl border-4 border-blue-400">
+                <div id="fridge-door" class="fridge-door bg-blue-500 w-full h-full rounded-lg absolute inset-0 z-10 flex items-center justify-center border-b-4 border-r-4 border-blue-600" onclick="toggleFridge()">
+                    <span class="text-2xl text-white font-bold tracking-widest drop-shadow-sm">FRIDGE</span>
+                </div>
+                <div class="flex flex-col justify-center items-center h-full p-2 gap-4">
+                    <span class="food-item" draggable="true" data-group="Proteins">🥩</span>
+                    <span class="food-item" draggable="true" data-group="Proteins">🍗</span>
+                    <span class="food-item" draggable="true" data-group="Proteins">🥚</span>
+                    <span class="food-item" draggable="true" data-group="Proteins">🐟</span>
+                    <span class="food-item" draggable="true" data-group="Fats">🥑</span>
+                    <span class="food-item" draggable="true" data-group="Fats">🧈</span>
+                    <span class="food-item" draggable="true" data-group="Fats">🫒</span>
+                </div>
+            </div>
+
+            <!-- Message Box -->
+            <div id="message-box" class="fixed inset-x-0 bottom-4 w-11/12 md:w-1/2 mx-auto p-4 bg-fuchsia-800 text-white rounded-xl shadow-2xl text-center text-lg hidden z-50">
+                You've created a balanced meal! 🥳
+            </div>
+            
+            <!-- Reset Button -->
+            <div class="fixed top-4 right-4 z-50">
+                <button onclick="resetMeal()" class="px-6 py-3 bg-fuchsia-600 text-white font-bold rounded-full shadow-lg hover:bg-fuchsia-700 transition-colors">Reset</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Store the ID of the dragged element
+        let draggedItem = null;
+
+        // An array to keep track of the food groups on the current plate
+        let currentPlateGroups = new Set();
+        
+        // Listen for drag events on all food items and plates
+        document.querySelectorAll('.food-item, .plate-stack-item').forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                draggedItem = e.target;
+                setTimeout(() => {
+                    e.target.classList.add('opacity-50');
+                }, 0);
+            });
+
+            item.addEventListener('dragend', (e) => {
+                e.target.classList.remove('opacity-50');
+            });
+        });
+
+        // Set up the drop zones
+        const table = document.getElementById('table');
+        
+        // Allow dropping onto the table
+        table.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        table.addEventListener('drop', (e) => {
+            e.preventDefault();
+            // Check if a plate is being dropped on the table
+            if (draggedItem && draggedItem.dataset.plate) {
+                const newPlate = draggedItem.cloneNode(true);
+                newPlate.classList.remove('plate-stack-item', 'opacity-50');
+                newPlate.style.marginTop = '0';
+                newPlate.id = `plate-on-table-${Date.now()}`;
+                newPlate.classList.add('plate-food-container');
+                newPlate.dataset.plate = 'on-table';
+                newPlate.dataset.groups = JSON.stringify([]);
+
+                // Add event listeners to the new plate for dropping food
+                newPlate.addEventListener('dragover', handlePlateDragOver);
+                newPlate.addEventListener('drop', handlePlateDrop);
+                
+                table.appendChild(newPlate);
+                draggedItem.remove();
+
+                // Hide the message
+                table.querySelector('p')?.classList.add('hidden');
+            }
+        });
+
+        // Function to handle dragover on a plate on the table
+        function handlePlateDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        }
+
+        // Function to handle drop on a plate on the table
+        function handlePlateDrop(e) {
+            e.preventDefault();
+            const plate = e.currentTarget;
+            if (draggedItem && !draggedItem.dataset.plate) {
+                const foodClone = draggedItem.cloneNode(true);
+                foodClone.classList.remove('opacity-50');
+                foodClone.style.cursor = 'default';
+                foodClone.draggable = false;
+                plate.appendChild(foodClone);
+                
+                // Add the food group to the plate's data
+                let groups = JSON.parse(plate.dataset.groups);
+                const foodGroup = draggedItem.dataset.group;
+                if (foodGroup) {
+                    groups.push(foodGroup);
+                    plate.dataset.groups = JSON.stringify(groups);
+                }
+
+                // Check for a balanced meal (at least one of Proteins, Carbs, Veggies, Fruits)
+                const uniqueGroups = new Set(groups);
+                if (uniqueGroups.has('Proteins') && uniqueGroups.has('Carbs') && uniqueGroups.has('Veggies') && uniqueGroups.has('Fruits')) {
+                    showMessage("You've created a balanced meal! 🥳");
+                }
+            }
+        }
+        
+        function showMessage(message) {
+            const messageBox = document.getElementById('message-box');
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        function toggleCupboard(id) {
+            const door = document.getElementById(`cupboard-door-${id}`);
+            door.classList.toggle('open');
+        }
+        
+        function toggleFridge() {
+            const door = document.getElementById('fridge-door');
+            door.classList.toggle('open');
+        }
+        
+        function resetMeal() {
+            const table = document.getElementById('table');
+            const platesOnTable = table.querySelectorAll('.plate-food-container');
+            platesOnTable.forEach(plate => plate.remove());
+            
+            // Re-add the plates to the stack
+            const plateStack = document.getElementById('plate-stack');
+            const plateIds = ['plate-4', 'plate-3', 'plate-2', 'plate-1'];
+            plateIds.forEach(id => {
+                const plate = document.createElement('div');
+                plate.id = id;
+                plate.classList.add('plate', 'plate-stack-item', 'cursor-grab', 'shadow-xl', 'bg-slate-100');
+                plate.draggable = true;
+                plate.dataset.plate = 'true';
+                plateStack.appendChild(plate);
+            });
+
+            // Re-add the welcome message
+            const welcomeMessage = table.querySelector('p');
+            if (welcomeMessage) {
+                welcomeMessage.classList.remove('hidden');
+            }
+            
+            // Close all cupboards and fridge
+            document.querySelectorAll('.cupboard-door').forEach(door => door.classList.remove('open'));
+            document.getElementById('fridge-door').classList.remove('open');
+            
+            // Re-add dragstart/dragend listeners
+            document.querySelectorAll('.food-item, .plate-stack-item').forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    draggedItem = e.target;
+                    setTimeout(() => {
+                        e.target.classList.add('opacity-50');
+                    }, 0);
+                });
+                item.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('opacity-50');
+                });
+            });
+        }
+    </script>
+</body>
+</html>
