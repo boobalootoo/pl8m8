@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balanced Meal Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom CSS for the macro bars to handle block styling */
+    .block {
+      width: 10px;
+      height: 100%;
+    }
+    .protein { background: #ef4444; }
+    .fat { background: #3b82f6; }
+    .carb { background: #facc15; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans">
+
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Balanced Meal Builder</h1>
+
+  <div class="flex flex-col lg:flex-row w-full max-w-7xl gap-6">
+
+    <!-- Food Sources Section -->
+    <div class="flex flex-row lg:flex-col gap-4">
+      <!-- Cupboards -->
+      <div class="w-full lg:w-48 bg-gray-50 rounded-lg shadow-lg p-4">
+        <div class="cursor-pointer font-semibold text-lg text-gray-700 p-2 hover:bg-gray-200 transition duration-200 rounded-md" onclick="toggleContent('cupboard')">
+          Cupboard
+        </div>
+        <div id="cupboard-content" class="cupboard-content flex-col items-center justify-center p-2 hidden">
+          <img src="https://img.icons8.com/color/96/bread.png" alt="Bread" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="9" data-fat="4" data-carbs="49">
+          <img src="https://img.icons8.com/color/96/cheese.png" alt="Cheese" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="25" data-fat="33" data-carbs="1">
+          <img src="https://img.icons8.com/color/96/oat-flakes.png" alt="Oats" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="13" data-fat="7" data-carbs="68">
+          <img src="https://img.icons8.com/color/96/rice-bowl.png" alt="Rice" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="4" data-fat="0" data-carbs="28">
+          <img src="https://img.icons8.com/color/96/olive-oil.png" alt="Olive Oil" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="0" data-fat="100" data-carbs="0">
+        </div>
+      </div>
+      
+      <!-- Fridge -->
+      <div class="w-full lg:w-48 bg-gray-50 rounded-lg shadow-lg p-4">
+        <div class="cursor-pointer font-semibold text-lg text-gray-700 p-2 hover:bg-gray-200 transition duration-200 rounded-md" onclick="toggleContent('fridge')">
+          Fridge
+        </div>
+        <div id="fridge-content" class="fridge-content flex-col items-center justify-center p-2 hidden">
+          <img src="https://img.icons8.com/color/96/steak.png" alt="Steak" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="27" data-fat="19" data-carbs="0">
+          <img src="https://img.icons8.com/color/96/broccoli.png" alt="Broccoli" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="3" data-fat="0" data-carbs="7">
+          <img src="https://img.icons8.com/color/96/eggs.png" alt="Eggs" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="13" data-fat="11" data-carbs="1">
+          <img src="https://img.icons8.com/color/96/milk-bottle.png" alt="Milk" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="3" data-fat="4" data-carbs="5">
+          <img src="https://img.icons8.com/color/96/salmon.png" alt="Salmon" class="food w-16 h-16 m-2 cursor-grab transition-transform transform hover:scale-110 rounded-md" draggable="true" data-protein="20" data-fat="13" data-carbs="0">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Table & Plate -->
+    <div id="table" class="flex-1 bg-white rounded-lg shadow-2xl p-6 min-h-[400px] border-4 border-amber-800 border-dashed relative overflow-hidden" 
+         ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+      <div id="plate-stack" class="absolute bottom-4 left-4 flex">
+        <img src="https://img.icons8.com/color/96/plate.png" alt="Plate" class="plate w-24 h-24 mr-2 cursor-grab transform hover:scale-105 transition-transform" draggable="true">
+      </div>
+      <div id="dropped-items" class="flex flex-wrap items-center justify-center h-full w-full">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Macros Section -->
+  <div class="w-full max-w-7xl bg-white rounded-lg shadow-lg p-6 mt-6">
+    <h2 class="text-2xl font-bold text-gray-700 mb-4">Macros Tracker</h2>
+    
+    <div class="mb-4">
+      <div class="font-medium text-gray-600 mb-1">Protein (target: 150g)</div>
+      <div class="macro-bar w-full h-8 bg-gray-200 rounded-full overflow-hidden relative">
+        <div id="proteinBar" class="h-full flex items-center transition-all duration-300"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-1 h-full bg-gray-900 absolute" style="left: calc(150px * 10 / 10 + 5px);"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <div class="font-medium text-gray-600 mb-1">Fat (target: 70g)</div>
+      <div class="macro-bar w-full h-8 bg-gray-200 rounded-full overflow-hidden relative">
+        <div id="fatBar" class="h-full flex items-center transition-all duration-300"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-1 h-full bg-gray-900 absolute" style="left: calc(70px * 10 / 10 + 5px);"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <div class="font-medium text-gray-600 mb-1">Carbs (target: 250g)</div>
+      <div class="macro-bar w-full h-8 bg-gray-200 rounded-full overflow-hidden relative">
+        <div id="carbBar" class="h-full flex items-center transition-all duration-300"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-1 h-full bg-gray-900 absolute" style="left: calc(250px * 10 / 10 + 5px);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleContent(type) {
+      const content = document.getElementById(type + '-content');
+      content.classList.toggle('hidden');
+      content.classList.toggle('flex');
+    }
+
+    let dragged;
+
+    document.addEventListener("dragstart", e => {
+      const target = e.target;
+      if (target.classList.contains("food") || target.classList.contains("plate")) {
+        dragged = target.cloneNode(true);
+        dragged.classList.add("origin-center", "transition-transform", "duration-200");
+        if (target.classList.contains("plate")) {
+          dragged.classList.remove('w-24', 'h-24');
+          dragged.classList.add('w-32', 'h-32');
+        }
+      }
+    });
+
+    function handleDrop(e) {
+      e.preventDefault();
+      if (!dragged) return;
+
+      const dropzone = e.target.closest('#table');
+
+      if (dropzone && dragged.classList.contains("food")) {
+        let wrapper = document.createElement("div");
+        wrapper.className = "dropped-food flex flex-col items-center justify-center m-4";
+
+        let foodImg = dragged;
+        foodImg.classList.remove('w-16', 'h-16');
+        foodImg.classList.add('w-24', 'h-24');
+        foodImg.style.width = "6rem";
+        foodImg.style.height = "6rem";
+
+        let slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = 1;
+        slider.max = 5;
+        slider.value = 1;
+        slider.className = "food-slider w-20 mt-2 accent-lime-500 cursor-pointer";
+
+        let button = document.createElement("button");
+        button.textContent = "Remove";
+        button.className = "mt-2 px-2 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition duration-200";
+        button.onclick = () => {
+            wrapper.remove();
+            updateMacros();
+        };
+
+        wrapper.appendChild(foodImg);
+        wrapper.appendChild(slider);
+        wrapper.appendChild(button);
+        
+        document.getElementById('dropped-items').appendChild(wrapper);
+
+        slider.addEventListener("input", () => {
+          const scale = parseInt(slider.value);
+          foodImg.style.width = (6 * scale) + "rem";
+          foodImg.style.height = (6 * scale) + "rem";
+          updateMacros();
+        });
+
+      } else if (dropzone && dragged.classList.contains("plate")) {
+          const droppedItemsContainer = document.getElementById('dropped-items');
+          droppedItemsContainer.appendChild(dragged);
+      }
+      updateMacros();
+    }
+
+    function updateMacros() {
+      let totalProtein = 0, totalFat = 0, totalCarbs = 0;
+
+      document.querySelectorAll(".dropped-food").forEach(df => {
+        let img = df.querySelector("img");
+        let slider = df.querySelector("input");
+        let scale = parseInt(slider.value);
+
+        totalProtein += parseInt(img.dataset.protein) * scale;
+        totalFat += parseInt(img.dataset.fat) * scale;
+        totalCarbs += parseInt(img.dataset.carbs) * scale;
+      });
+
+      renderBar("proteinBar", totalProtein, "protein");
+      renderBar("fatBar", totalFat, "fat");
+      renderBar("carbBar", totalCarbs, "carb");
+    }
+
+    function renderBar(barId, value, type) {
+      const bar = document.getElementById(barId);
+      let targetValue = 0;
+      if (barId === "proteinBar") targetValue = 150;
+      else if (barId === "fatBar") targetValue = 70;
+      else if (barId === "carbBar") targetValue = 250;
+
+      const widthPercent = Math.min((value / targetValue) * 100, 100);
+      bar.innerHTML = ''; // Clear previous blocks
+      
+      const barSegment = document.createElement('div');
+      barSegment.style.width = `${widthPercent}%`;
+      barSegment.classList.add('h-full', type, 'transition-all', 'duration-500');
+      bar.appendChild(barSegment);
+
+      // Add text overlay
+      const textOverlay = document.createElement('div');
+      textOverlay.textContent = `${value}g`;
+      textOverlay.classList.add('absolute', 'top-0', 'left-2', 'font-bold', 'text-gray-800');
+      if (widthPercent > 50) {
+        textOverlay.classList.add('text-white');
+      }
+      bar.appendChild(textOverlay);
+
+    }
+    
+    // Initial macro update
+    updateMacros();
+  </script>
+</body>
+</html>
