@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Balanced Meal Builder</title>
+  <style>
+    :root{
+      --bg:#f4f6f8; --wood:#caa57a; --wood-dark:#a98257; --line:#2f3437; --accent:#2f7d32;
+      --plate:#fff; --plate-edge:#d9d9d9; --work:#e9edf1; --shadow:0 2px 8px rgba(0,0,0,.15);
+      --door:#d0d7de; --door-inner:#ffffff; --fridge:#dfe7ef; --fridge-dark:#c7d4e1;
+      --text:#1f2937; --muted:#6b7280;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
+
+    /* Layout */
+    .page{display:grid;grid-template-rows:auto 1fr;gap:12px;height:100vh;}
+    .kitchen-top{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px}
+    .cupboards-area{display:flex;gap:12px;align-items:flex-end}
+    .cupboard{position:relative;width:220px;height:150px;background:var(--wood);border:2px solid var(--wood-dark);border-radius:8px;box-shadow:var(--shadow);overflow:hidden}
+    .cupboard .inner{position:absolute;inset:8px;background:var(--door-inner);border-radius:6px;padding:6px;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:44px;gap:6px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .cupboard.open .inner{opacity:1;pointer-events:auto}
+    .door{position:absolute;inset:0;background:linear-gradient(135deg,#e6ebf0,#cfd6dc);border-radius:6px;margin:6px;box-shadow:inset 0 0 0 2px #b5bcc4;transform-origin:left center;transition:transform .35s;}
+    .cupboard.open .door{transform:perspective(800px) rotateY(-88deg)}
+    .handle{position:absolute;right:12px;top:50%;width:8px;height:28px;background:#888;border-radius:4px;transform:translateY(-50%)}
+    .cupboard h3{position:absolute;left:10px;top:8px;margin:0;font-size:14px;color:#374151}
+
+    .fridge{position:relative;width:160px;height:240px;border-radius:14px;background:var(--fridge);border:2px solid var(--fridge-dark);box-shadow:var(--shadow)}
+    .fridge .seal{position:absolute;inset:8px;border-radius:10px;border:2px solid var(--fridge-dark)}
+    .fridge .door{position:absolute;inset:0;background:linear-gradient(135deg,#f3f6fa,#d7e2ee);border-radius:12px;transform-origin:left center;margin:0;box-shadow:inset 0 0 0 2px #b9c7d8;}
+    .fridge .handle{position:absolute;right:10px;top:30%;width:10px;height:60px;background:#8da4bc;border-radius:6px}
+    .fridge .inner{position:absolute;inset:12px;background:#ffffff;border-radius:10px;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:48px;gap:6px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .fridge.open .inner{opacity:1;pointer-events:auto}
+    .fridge.open .door{transform:perspective(900px) rotateY(-88deg)}
+
+    .workspace{display:grid;grid-template-columns:1fr 220px 190px;gap:12px;padding:12px;height:100%;}
+    .table-area{position:relative;background:var(--work);border:2px solid #cfd6dd;border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+    .table-edge{position:absolute;left:0;right:0;bottom:0;height:18px;background:linear-gradient(#d3b186,#b18a60);}
+
+    .stack-panel{display:flex;flex-direction:column;gap:12px}
+    .stack{position:relative;height:120px;border-radius:12px;background:#fff;border:2px dashed #b9c1c9;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+    .stack .plate-stack{position:absolute;bottom:6px;width:100%;height:100%}
+    .stack .plate{position:absolute;left:50%;transform:translateX(-50%);width:120px;height:120px;border-radius:50%;background:var(--plate);border:6px solid var(--plate-edge);box-shadow:0 4px 6px rgba(0,0,0,.12)}
+    .stack .plate:nth-child(1){bottom:10px}
+    .stack .plate:nth-child(2){bottom:16px}
+    .stack .plate:nth-child(3){bottom:22px}
+    .stack .plate:nth-child(4){bottom:28px}
+    .stack .plate:nth-child(5){bottom:34px}
+    .stack button{z-index:2;padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#0ea5e9;color:white;font-weight:600;cursor:pointer}
+
+    .legend{background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+    .legend h4{margin:0 0 8px 0}
+    .key{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;font-size:14px;margin:6px 0}
+    .swatch{width:16px;height:16px;border-radius:3px;border:1px solid #cbd5e1}
+
+    .bin{margin-top:auto;background:#fee2e2;border:2px dashed #ef4444;border-radius:12px;min-height:70px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#991b1b}
+
+    /* Food items */
+    .food{user-select:none;cursor:grab;border:1px solid #cfd6dd;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;padding:3px;box-shadow:var(--shadow)}
+    .food:active{cursor:grabbing}
+
+    /* Table contents */
+    .table{position:absolute;inset:12px;}
+    .plate-on-table{position:absolute;width:160px;height:160px;border-radius:50%;background:var(--plate);border:10px solid var(--plate-edge);box-shadow:0 5px 10px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center}
+    .plate-on-table.selected{outline:3px solid var(--accent)}
+    .plate-label{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--muted)}
+
+    .food-on-plate{position:absolute;min-width:60px;min-height:28px;border-radius:8px;padding:4px 6px;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:move}
+
+    .toolbar{display:flex;gap:8px;align-items:center}
+    .notice{font-size:12px;color:var(--muted)}
+
+    .progress{height:8px;background:#eef2f7;border-radius:6px;overflow:hidden;margin:6px 0}
+    .bar{height:100%}
+
+    /* Category colors */
+    .c-veg{background:#d1fae5;border-color:#10b981}
+    .c-protein{background:#fee2e2;border-color:#ef4444}
+    .c-carb{background:#fef3c7;border-color:#f59e0b}
+    .c-dairy{background:#e0e7ff;border-color:#6366f1}
+    .c-fat{background:#fde2f2;border-color:#ec4899}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="kitchen-top">
+      <div class="cupboards-area">
+        <div class="cupboard" data-name="Cupboard 1">
+          <h3>Grains & Carbs</h3>
+          <div class="inner" aria-label="Cupboard contents">
+            <div class="food c-carb" draggable="true" data-name="Brown Rice" data-cat="carb">Brown Rice</div>
+            <div class="food c-carb" draggable="true" data-name="Whole Pasta" data-cat="carb">Whole Pasta</div>
+            <div class="food c-carb" draggable="true" data-name="Quinoa" data-cat="carb">Quinoa</div>
+            <div class="food c-carb" draggable="true" data-name="Whole Bread" data-cat="carb">Whole Bread</div>
+            <div class="food c-carb" draggable="true" data-name="Potatoes" data-cat="carb">Potatoes</div>
+            <div class="food c-carb" draggable="true" data-name="Oats" data-cat="carb">Oats</div>
+          </div>
+          <div class="door" role="button" aria-label="Open cupboard"><span class="handle"></span></div>
+        </div>
+        <div class="cupboard" data-name="Cupboard 2">
+          <h3>Proteins</h3>
+          <div class="inner">
+            <div class="food c-protein" draggable="true" data-name="Chicken" data-cat="protein">Chicken</div>
+            <div class="food c-protein" draggable="true" data-name="Tofu" data-cat="protein">Tofu</div>
+            <div class="food c-protein" draggable="true" data-name="Lentils" data-cat="protein">Lentils</div>
+            <div class="food c-protein" draggable="true" data-name="Eggs" data-cat="protein">Eggs</div>
+            <div class="food c-protein" draggable="true" data-name="Beans" data-cat="protein">Beans</div>
+            <div class="food c-protein" draggable="true" data-name="Fish" data-cat="protein">Fish</div>
+          </div>
+          <div class="door" role="button" aria-label="Open cupboard"><span class="handle"></span></div>
+        </div>
+        <div class="cupboard" data-name="Cupboard 3">
+          <h3>Veg & Fruit</h3>
+          <div class="inner">
+            <div class="food c-veg" draggable="true" data-name="Broccoli" data-cat="veg">Broccoli</div>
+            <div class="food c-veg" draggable="true" data-name="Carrots" data-cat="veg">Carrots</div>
+            <div class="food c-veg" draggable="true" data-name="Spinach" data-cat="veg">Spinach</div>
+            <div class="food c-veg" draggable="true" data-name="Tomatoes" data-cat="veg">Tomatoes</div>
+            <div class="food c-veg" draggable="true" data-name="Apples" data-cat="veg">Apples</div>
+            <div class="food c-veg" draggable="true" data-name="Peppers" data-cat="veg">Peppers</div>
+          </div>
+          <div class="door" role="button" aria-label="Open cupboard"><span class="handle"></span></div>
+        </div>
+      </div>
+      <div class="fridge" aria-label="Fridge" title="Fridge">
+        <div class="seal"></div>
+        <div class="inner">
+          <div class="food c-dairy" draggable="true" data-name="Yogurt" data-cat="dairy">Yogurt</div>
+          <div class="food c-dairy" draggable="true" data-name="Cheese" data-cat="dairy">Cheese</div>
+          <div class="food c-fat" draggable="true" data-name="Olive Oil" data-cat="fat">Olive Oil</div>
+          <div class="food c-fat" draggable="true" data-name="Nuts" data-cat="fat">Nuts</div>
+          <div class="food c-veg" draggable="true" data-name="Berries" data-cat="veg">Berries</div>
+          <div class="food c-protein" draggable="true" data-name="Greek Yogurt" data-cat="protein">Greek Yogurt</div>
+        </div>
+        <div class="door" role="button" aria-label="Open fridge"><span class="handle"></span></div>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <div class="table-area">
+        <div class="table" id="table"></div>
+        <div class="table-edge"></div>
+      </div>
+
+      <div class="stack-panel">
+        <div class="toolbar">
+          <button id="addPlate">Take Plate</button>
+          <span class="notice">Tip: drag foods onto a plate. Click a plate to see balance.</span>
+        </div>
+        <div class="stack">
+          <div class="plate-stack" id="plateStack">
+            <div class="plate"></div>
+            <div class="plate"></div>
+            <div class="plate"></div>
+            <div class="plate"></div>
+            <div class="plate"></div>
+          </div>
+          <button id="takeFromStack" aria-label="Take plate from stack">Take from stack</button>
+        </div>
+        <div class="legend" id="legend">
+          <h4>Plate Balance</h4>
+          <div class="key"><span class="swatch c-veg"></span><span>Veg & Fruit</span><span id="pct-veg">0%</span></div>
+          <div class="progress"><div class="bar c-veg" id="bar-veg" style="width:0%"></div></div>
+          <div class="key"><span class="swatch c-protein"></span><span>Protein</span><span id="pct-protein">0%</span></div>
+          <div class="progress"><div class="bar c-protein" id="bar-protein" style="width:0%"></div></div>
+          <div class="key"><span class="swatch c-carb"></span><span>Carbs</span><span id="pct-carb">0%</span></div>
+          <div class="progress"><div class="bar c-carb" id="bar-carb" style="width:0%"></div></div>
+          <div class="key"><span class="swatch c-dairy"></span><span>Dairy</span><span id="pct-dairy">0%</span></div>
+          <div class="progress"><div class="bar c-dairy" id="bar-dairy" style="width:0%"></div></div>
+          <div class="key"><span class="swatch c-fat"></span><span>Fats</span><span id="pct-fat">0%</span></div>
+          <div class="progress"><div class="bar c-fat" id="bar-fat" style="width:0%"></div></div>
+          <small class="notice">Aim for ~½ Veg/Fruit, ¼ Protein, ¼ Carbs. Small Dairy/Fats.</small>
+        </div>
+        <div class="bin" id="bin" aria-label="Trash">Drop here to remove</div>
+      </div>
+
+      <div class="legend">
+        <h4>Instructions</h4>
+        <ol>
+          <li>Open a cupboard or the fridge.</li>
+          <li>Click <em>Take Plate</em> or <em>Take from stack</em>, then drag the plate onto the table.</li>
+          <li>Drag foods onto a plate. Drag items to the <strong>Trash</strong> to remove.</li>
+          <li>Click a plate to see its balance on the right.</li>
+        </ol>
+        <small class="notice">Works best on desktop browsers that support drag & drop.</small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Open/close cupboards & fridge ---
+    document.querySelectorAll('.cupboard .door').forEach(door=>{
+      door.addEventListener('click',()=>{
+        door.parentElement.classList.toggle('open');
+      });
+    });
+    document.querySelectorAll('.fridge .door').forEach(door=>{
+      door.addEventListener('click',()=>{
+        door.parentElement.classList.toggle('open');
+      });
+    });
+
+    const table = document.getElementById('table');
+    const bin = document.getElementById('bin');
+    const plateStack = document.getElementById('plateStack');
+
+    let plateCount = 5;
+    const selected = { plate: null };
+
+    function uid(){return 'id-'+Math.random().toString(36).slice(2,9)}
+
+    function createPlate({x=40,y=40}={}){
+      const id = uid();
+      const plate = document.createElement('div');
+      plate.className = 'plate-on-table';
+      plate.style.left = x+'px';
+      plate.style.top = y+'px';
+      plate.dataset.id = id;
+      plate.dataset.items = JSON.stringify([]);
+
+      const label = document.createElement('div');
+      label.className = 'plate-label';
+      label.textContent = 'Plate';
+      plate.appendChild(label);
+
+      // Make plate droppable
+      plate.addEventListener('dragover', e=>{ e.preventDefault(); });
+      plate.addEventListener('drop', e=>{
+        e.preventDefault();
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        if(data.type==='food'){
+          addFoodToPlate(plate, data.payload);
+        } else if(data.type==='foodOnPlate'){
+          // Reposition within same/different plate
+          const el = document.getElementById(data.payload.id);
+          if(el){
+            const rect = plate.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left; 
+            const offsetY = e.clientY - rect.top;
+            plate.appendChild(el);
+            el.style.left = (offsetX - el.offsetWidth/2) + 'px';
+            el.style.top = (offsetY - el.offsetHeight/2) + 'px';
+            computeBalance(plate);
+            if(selected.plate) computeBalance(selected.plate);
+          }
+        }
+      });
+
+      plate.addEventListener('click', ()=>{
+        selectPlate(plate);
+      });
+
+      // Allow moving the entire plate on table
+      plate.setAttribute('draggable','true');
+      plate.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/plain', JSON.stringify({type:'plate', payload:{id: plate.dataset.id}}));
+      });
+
+      table.appendChild(plate);
+      selectPlate(plate);
+      return plate;
+    }
+
+    function selectPlate(plate){
+      document.querySelectorAll('.plate-on-table').forEach(p=>p.classList.remove('selected'));
+      plate.classList.add('selected');
+      selected.plate = plate;
+      computeBalance(plate);
+    }
+
+    function addFoodToPlate(plate, {name,cat}){
+      const item = document.createElement('div');
+      item.className = `food-on-plate c-${cat}`;
+      item.textContent = name;
+      item.id = uid();
+      // place roughly centered
+      item.style.left = '50%';
+      item.style.top = '50%';
+      item.style.transform = 'translate(-50%,-50%)';
+
+      // Make draggable
+      item.setAttribute('draggable','true');
+      item.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/plain', JSON.stringify({type:'foodOnPlate', payload:{id:item.id}}));
+      });
+
+      // Remove translate after drop so we can place via absolute left/top
+      item.addEventListener('dragend', ()=>{ item.style.transform = ''; });
+
+      plate.appendChild(item);
+      computeBalance(plate);
+      if(selected.plate === plate) computeBalance(plate);
+    }
+
+    // Drag from cupboards/fridge (create new copy on drop)
+    document.querySelectorAll('.food').forEach(food=>{
+      food.addEventListener('dragstart', e=>{
+        const payload = {name: food.dataset.name, cat: food.dataset.cat};
+        e.dataTransfer.setData('text/plain', JSON.stringify({type:'food', payload}));
+      });
+    });
+
+    // Allow dropping/moving plates around the table area
+    table.addEventListener('dragover', e=>{ e.preventDefault(); });
+    table.addEventListener('drop', e=>{
+      e.preventDefault();
+      const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+      const rect = table.getBoundingClientRect();
+      const x = e.clientX - rect.left - 80; // center plate
+      const y = e.clientY - rect.top - 80;
+      if(data.type==='plate'){
+        const plate = [...document.querySelectorAll('.plate-on-table')].find(p=>p.dataset.id===data.payload.id);
+        if(plate){
+          plate.style.left = Math.max(0, Math.min(rect.width-160, x)) + 'px';
+          plate.style.top = Math.max(0, Math.min(rect.height-160, y)) + 'px';
+        }
+      } else if(data.type==='foodOnPlate'){
+        const el = document.getElementById(data.payload.id);
+        if(el && el.parentElement.classList.contains('plate-on-table')){
+          const parent = el.parentElement;
+          const prect = parent.getBoundingClientRect();
+          // if dropped on table background, keep relative to the same plate position
+          const offsetX = e.clientX - prect.left; 
+          const offsetY = e.clientY - prect.top;
+          el.style.left = (offsetX - el.offsetWidth/2) + 'px';
+          el.style.top = (offsetY - el.offsetHeight/2) + 'px';
+          computeBalance(parent);
+          if(selected.plate===parent) computeBalance(parent);
+        }
+      }
+    });
+
+    // Trash bin handling
+    bin.addEventListener('dragover', e=>{ e.preventDefault(); bin.style.background = '#fecaca'; });
+    bin.addEventListener('dragleave', ()=>{ bin.style.background = '#fee2e2'; });
+    bin.addEventListener('drop', e=>{
+      e.preventDefault(); bin.style.background = '#fee2e2';
+      const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+      if(data.type==='foodOnPlate'){
+        const el = document.getElementById(data.payload.id);
+        if(el){ const parent = el.parentElement; el.remove(); if(parent) computeBalance(parent); }
+      } else if(data.type==='plate'){
+        const plate = [...document.querySelectorAll('.plate-on-table')].find(p=>p.dataset.id===data.payload.id);
+        if(plate){ plate.remove(); if(selected.plate===plate) resetLegend(); }
+      }
+    });
+
+    // Plate stack buttons
+    function takePlate(){
+      if(plateCount>0){
+        plateCount--; plateStack.lastElementChild?.remove();
+        const plate = createPlate({x:24, y:24});
+        return plate;
+      } else {
+        alert('No more plates in the stack!');
+      }
+    }
+
+    document.getElementById('addPlate').addEventListener('click', takePlate);
+    document.getElementById('takeFromStack').addEventListener('click', takePlate);
+
+    // Balance computation
+    function computeBalance(plate){
+      const items = [...plate.querySelectorAll('.food-on-plate')].map(el=>{
+        const cls = [...el.classList].find(c=>c.startsWith('c-'))||'';
+        const cat = cls.replace('c-','');
+        return {cat};
+      });
+      const counts = {veg:0, protein:0, carb:0, dairy:0, fat:0};
+      items.forEach(i=>{ if(counts[i.cat]!==undefined) counts[i.cat]++; });
+      const total = Math.max(1, items.length); // avoid divide by zero
+      const pct = Object.fromEntries(Object.entries(counts).map(([k,v])=>[k, Math.round(v*100/total)]));
+      updateLegend(pct);
+    }
+
+    function updateLegend(pct){
+      ['veg','protein','carb','dairy','fat'].forEach(k=>{
+        document.getElementById('pct-'+k).textContent = pct[k] + '%';
+        document.getElementById('bar-'+k).style.width = pct[k] + '%';
+      });
+    }
+    function resetLegend(){ updateLegend({veg:0,protein:0,carb:0,dairy:0,fat:0}); }
+
+    // Seed one plate
+    takePlate();
+  </script>
+</body>
+</html>
