@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .protein-fill { background-color: #ef4444; }
+    .fat-fill { background-color: #3b82f6; }
+    .carb-fill { background-color: #facc15; }
+    .wireframe-panel { background-color: #f3f4f6; border: 1px solid #d1d5db; }
+    .draggable-food { cursor: grab; transition: transform 0.2s ease-in-out; }
+    .draggable-food:hover { transform: scale(1.1); }
+    .dropzone { border: 2px dashed #9ca3af; transition: border-color 0.2s ease-in-out; }
+    .dropzone.drag-over { border-color: #4b5563; }
+
+    .bucket {
+      position: relative;
+      width: 20px;
+      border: 2px solid #374151;
+      background: #e5e7eb;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      margin: 0;
+      overflow: visible;
+    }
+    .macro-block { width: 10px; height: 10px; margin: 1px 0; border: 1px solid #374151; }
+    .macro-column { display: flex; flex-direction: column-reverse; align-items: center; margin: 2px 0; }
+    .excess-area {
+      position: absolute;
+      bottom: -1px;
+      transform: translateY(100%);
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .dropped-food-wrapper {
+      position: absolute;
+      z-index: 10;
+      cursor: grab;
+      display: inline-block; /* allows free movement */
+    }
+
+   #tabletop {
+  background-color: #8B4513; /* brown color */
+  background-size: cover;
+  background-position: center;
+}
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans">
+
+<div class="flex flex-grow w-full max-w-7xl h-[80vh] gap-4 p-4 rounded-lg shadow-lg bg-white">
+
+  <!-- Nutrition Buckets -->
+  <div class="flex flex-col w-1/5 wireframe-panel rounded-lg p-4 items-center">
+      <div class="flex flex-grow justify-evenly items-stretch w-full mb-4">
+          <div class="flex flex-col items-center relative">
+            <div class="bucket h-[180px]" id="proteinBucket"></div>
+            <div class="excess-area" id="proteinExcess"></div>
+            <span class="text-gray-600 mt-2 text-sm font-semibold">Protein</span>
+          </div>
+          <div class="flex flex-col items-center relative">
+            <div class="bucket h-[84px]" id="fatBucket"></div>
+            <div class="excess-area" id="fatExcess"></div>
+            <span class="text-gray-600 mt-2 text-sm font-semibold">Fat</span>
+          </div>
+          <div class="flex flex-col items-center relative">
+            <div class="bucket h-[300px]" id="carbBucket"></div>
+            <div class="excess-area" id="carbExcess"></div>
+            <span class="text-gray-600 mt-2 text-sm font-semibold">Carbs</span>
+          </div>
+      </div>
+      <span class="text-gray-500 text-xs text-center">Each block represents 10g</span>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col gap-4">
+    <div class="flex-grow wireframe-panel rounded-lg p-4 dropzone relative" id="tabletop" ondragover="event.preventDefault()" ondrop="handleDrop(event, this)">
+    </div>
+  </div>
+
+  <!-- Cabinets & Fridge -->
+  <div class="flex flex-col w-1/5 gap-4">
+    <div class="flex-1 wireframe-panel rounded-lg p-4 flex flex-col">
+      <div id="cabinets-content" class="flex-grow flex flex-wrap items-center justify-center p-2 overflow-hidden">
+        <!-- Example food items -->
+        <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="9" data-fat="4" data-carbs="49" data-src="https://img.icons8.com/color/96/bread.png">
+            <img src="https://img.icons8.com/color/96/bread.png" class="food w-16 h-16 rounded-md">
+            <div class="macro-display ml-2 flex flex-col"></div>
+        </div>
+        <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="25" data-fat="33" data-carbs="1" data-src="https://img.icons8.com/color/96/cheese.png">
+            <img src="https://img.icons8.com/color/96/cheese.png" class="food w-16 h-16 rounded-md">
+            <div class="macro-display ml-2 flex flex-col"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let dragged;
+document.addEventListener("dragstart", e => {
+  if (e.target.closest('.food-slider, button')) return;
+
+  const foodItem = e.target.closest('.draggable-food');
+  const droppedItem = e.target.closest('.dropped-food-wrapper');
+
+  if (foodItem) {
+    dragged = foodItem.cloneNode(true);
+    e.dataTransfer.setData('text/plain', 'food');
+  } else if (droppedItem) {
+    dragged = droppedItem;
+    e.dataTransfer.setData('text/plain', 'dropped-item');
+  } else return;
+
+  document.querySelectorAll('.dropzone').forEach(dz => dz.classList.add('drag-over'));
+  if (droppedItem) setTimeout(() => droppedItem.style.visibility = 'hidden', 0);
+});
+
+document.addEventListener("dragend", e => {
+  document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('drag-over'));
+  if (dragged && dragged.closest('#tabletop')) dragged.style.visibility = 'visible';
+  updateMacros();
+  dragged = null;
+});
+
+function handleDrop(e, dropzone) {
+  e.preventDefault();
+  const dropType = e.dataTransfer.getData('text/plain');
+  const targetElement = e.target.closest('#tabletop');
+  if (!targetElement) return;
+
+  const rect = targetElement.getBoundingClientRect();
+  let x = e.clientX - rect.left;
+  let y = e.clientY - rect.top;
+
+  if (dropType === 'food') {
+      const foodWrapper = addDroppedFoodItem(dragged);
+      foodWrapper.style.left = `${x}px`;
+      foodWrapper.style.top = `${y}px`;
+      targetElement.appendChild(foodWrapper);
+  } else if (dropType === 'dropped-item') {
+      dragged.style.left = `${x}px`;
+      dragged.style.top = `${y}px`;
+      targetElement.appendChild(dragged);
+  }
+  updateMacros();
+}
+
+function addDroppedFoodItem(foodItem) {
+  let wrapper = document.createElement("div");
+  wrapper.className = "dropped-food-wrapper";
+  wrapper.draggable = false;
+
+  const imgSource = foodItem.querySelector('img').src;
+  const protein = parseFloat(foodItem.dataset.protein);
+  const fat = parseFloat(foodItem.dataset.fat);
+  const carbs = parseFloat(foodItem.dataset.carbs);
+
+  let foodImg = document.createElement('img');
+  foodImg.src = imgSource;
+  foodImg.classList.add('food','w-20','h-20');
+  foodImg.dataset.protein = protein;
+  foodImg.dataset.fat = fat;
+  foodImg.dataset.carbs = carbs;
+
+  let macroDisplay = document.createElement('div');
+  macroDisplay.className = "macro-display flex flex-col ml-2";
+
+  let sliderContainer = document.createElement("div");
+  sliderContainer.className = "flex flex-col items-center ml-4";
+
+  let portionLabel = document.createElement("span");
+  portionLabel.className = "portion-label text-sm text-gray-700";
+
+  let slider = document.createElement("input");
+  slider.type="range"; slider.min=10; slider.max=500; slider.value=100;
+  slider.className="food-slider w-16 accent-lime-500 cursor-pointer";
+  slider.addEventListener("input", ()=> {
+      updateMacros();
+      renderMacrosForFoodItem(macroDisplay, protein*(slider.value/100), fat*(slider.value/100), carbs*(slider.value/100));
+  });
+
+  let removeButton = document.createElement("button");
+  removeButton.textContent = "Remove";
+  removeButton.className = "mt-2 px-2 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition duration-200";
+  removeButton.onclick = () => { wrapper.remove(); updateMacros(); };
+
+  sliderContainer.appendChild(portionLabel);
+  sliderContainer.appendChild(slider);
+  sliderContainer.appendChild(removeButton);
+
+  let innerWrapper = document.createElement("div");
+  innerWrapper.className = "flex items-center justify-center";
+  innerWrapper.appendChild(foodImg);
+  innerWrapper.appendChild(macroDisplay);
+  innerWrapper.appendChild(sliderContainer);
+
+  wrapper.appendChild(innerWrapper);
+
+  renderMacrosForFoodItem(macroDisplay, protein, fat, carbs);
+  updateMacros();
+
+  // --- Drag logic ---
+  let offsetX = 0, offsetY = 0;
+  wrapper.addEventListener("mousedown", e => {
+    if (e.target.closest('.food-slider, button')) return;
+    e.preventDefault();
+
+    const tabletop = document.getElementById('tabletop');
+    const tabletopRect = tabletop.getBoundingClientRect();
+    const wrapperRect = wrapper.getBoundingClientRect();
+
+    offsetX = e.clientX - wrapperRect.left;
+    offsetY = e.clientY - wrapperRect.top;
+
+    wrapper.style.cursor = 'grabbing';
+
+    function onMouseMove(ev) {
+      let x = ev.clientX - tabletopRect.left - offsetX;
+      let y = ev.clientY - tabletopRect.top - offsetY;
+      x = Math.max(0, Math.min(x, tabletop.clientWidth - wrapper.offsetWidth));
+      y = Math.max(0, Math.min(y, tabletop.clientHeight - wrapper.offsetHeight));
+      wrapper.style.left = x + 'px';
+      wrapper.style.top = y + 'px';
+    }
+
+    function onMouseUp() {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      wrapper.style.cursor = 'grab';
+      updateMacros();
+    }
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  });
+
+  return wrapper;
+}
+
+function renderMacrosForFoodItem(macroDisplayElement, p, f, c){
+  macroDisplayElement.innerHTML='';
+  const macros=[{value:p,color:'protein-fill'},{value:f,color:'fat-fill'},{value:c,color:'carb-fill'}];
+  macros.forEach(macro=>{
+    const row=document.createElement('div');
+    row.className='macro-column';
+    const blockCount=Math.floor(macro.value/10);
+    for(let i=0;i<blockCount;i++){
+      const block=document.createElement("div");
+      block.className=`macro-block ${macro.color}`;
+      row.appendChild(block);
+    }
+    macroDisplayElement.appendChild(row);
+  });
+}
+
+function updateMacros(){
+  let totalProtein=0,totalFat=0,totalCarbs=0;
+  document.querySelectorAll(".dropped-food-wrapper").forEach(df=>{
+    let img=df.querySelector(".food");
+    let slider=df.querySelector(".food-slider");
+    if(img&&slider){
+      let w=parseInt(slider.value);
+      let portionLabel=df.querySelector(".portion-label");
+      if(portionLabel) portionLabel.textContent=`${w}g`;
+      totalProtein+=(parseFloat(img.dataset.protein)/100)*w;
+      totalFat+=(parseFloat(img.dataset.fat)/100)*w;
+      totalCarbs+=(parseFloat(img.dataset.carbs)/100)*w;
+    }
+  });
+  renderBuckets(totalProtein,totalFat,totalCarbs);
+}
+
+function renderBuckets(p,f,c){
+  renderBucket("proteinBucket","proteinExcess",p,"protein-fill",150);
+  renderBucket("fatBucket","fatExcess",f,"fat-fill",70);
+  renderBucket("carbBucket","carbExcess",c,"carb-fill",250);
+}
+
+function renderBucket(bucketId,excessId,value,colorClass,target){
+  const bucket=document.getElementById(bucketId);
+  const excess=document.getElementById(excessId);
+  if (!bucket || !excess) return;
+  bucket.querySelectorAll(".macro-block").forEach(el=>el.remove());
+  excess.querySelectorAll(".macro-block").forEach(el=>el.remove());
+  let blocks=Math.floor(value/10);
+  let maxBlocks=Math.floor(target/10);
+  for(let i=0;i<blocks;i++){
+    const block=document.createElement("div");
+    block.className=`macro-block ${colorClass}`;
+    if(i<maxBlocks){ bucket.appendChild(block);} else{ excess.appendChild(block);}
+  }
+}
+
+function initializeFoodItems(){
+  document.querySelectorAll('.draggable-food').forEach(foodItem=>{
+    const protein=parseFloat(foodItem.dataset.protein);
+    const fat=parseFloat(foodItem.dataset.fat);
+    const carbs=parseFloat(foodItem.dataset.carbs);
+    renderMacrosForFoodItem(foodItem.querySelector('.macro-display'),protein,fat,carbs);
+  });
+}
+window.onload=()=>{ initializeFoodItems(); updateMacros(); }
+</script>
+</body>
+</html>
