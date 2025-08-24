@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balanced Meal Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Define colors for the filled bar segments */
+    .protein-fill { background-color: #ef4444; }
+    .fat-fill { background-color: #3b82f6; }
+    .carb-fill { background-color: #facc15; }
+    /* Simple grey background to match the wireframe style */
+    .wireframe-panel {
+        background-color: #f3f4f6;
+        border: 1px solid #d1d5db;
+    }
+    .draggable-food {
+        cursor: grab;
+        transition: transform 0.2s ease-in-out;
+    }
+    .draggable-food:hover {
+        transform: scale(1.1);
+    }
+    .dropzone {
+        border: 2px dashed #9ca3af;
+        transition: border-color 0.2s ease-in-out;
+    }
+    .dropzone.drag-over {
+        border-color: #4b5563;
+    }
+    /* Grid-specific styles for the nutrient bars */
+    .nutrient-grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(25, 1fr);
+      height: 100%;
+      background-color: #d1d5db; /* This provides the grid lines */
+    }
+    .grid-cell {
+      background-color: #e5e7eb; /* Default background for empty cells */
+      border: 1px solid #d1d5db; /* Ensures the cell borders are visible */
+    }
+    .target-line {
+      border-top: 2px dashed #6b7280;
+    }
+    /* Styles for the plate stack */
+    .plate {
+      position: absolute;
+      width: 6rem; /* 96px */
+      height: 6rem; /* 96px */
+      cursor: grab;
+      transition: all 0.2s ease-in-out;
+    }
+    .plate:hover {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans">
+
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Balanced Meal Builder</h1>
+
+  <div class="flex flex-grow w-full max-w-7xl h-[80vh] gap-4 p-4 rounded-lg shadow-lg bg-white">
+    
+    <!-- Nutrient Info Panel (Left) -->
+    <div class="flex flex-col w-1/5 wireframe-panel rounded-lg p-4">
+        <h2 class="text-xl font-bold text-gray-700 mb-4 text-center">Nutrient Info</h2>
+        <div class="flex-1 flex flex-col items-center justify-end">
+            <!-- Labels above the grid -->
+            <div class="flex justify-between w-full text-center mb-2">
+                <span class="font-bold text-sm text-gray-700 w-1/3">P</span>
+                <span class="font-bold text-sm text-gray-700 w-1/3">F</span>
+                <span class="font-bold text-sm text-gray-700 w-1/3">C</span>
+            </div>
+            <div id="nutrient-grid" class="nutrient-grid-container w-full h-[calc(100%-4rem)]">
+                <!-- Grid cells will be generated here by JavaScript -->
+            </div>
+            <div class="flex justify-between w-full mt-2">
+                <div class="flex flex-col items-center w-1/3">
+                    <span class="font-medium text-gray-600 text-xs">Protein</span>
+                    <span id="protein-total" class="font-medium text-gray-500 text-xs">0g</span>
+                </div>
+                <div class="flex flex-col items-center w-1/3">
+                    <span class="font-medium text-gray-600 text-xs">Fat</span>
+                    <span id="fat-total" class="font-medium text-gray-500 text-xs">0g</span>
+                </div>
+                <div class="flex flex-col items-center w-1/3">
+                    <span class="font-medium text-gray-600 text-xs">Carbs</span>
+                    <span id="carbs-total" class="font-medium text-gray-500 text-xs">0g</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kitchen Panels (Center) -->
+    <div class="flex-1 flex flex-col gap-4">
+        <!-- Cabinets (Top) -->
+        <div class="flex-1 wireframe-panel rounded-lg p-4 flex flex-col">
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Cabinets</h2>
+            <div id="cabinets-content" class="flex-grow flex flex-wrap items-center justify-center p-2 overflow-hidden">
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="9" data-fat="4" data-carbs="49" data-src="https://img.icons8.com/color/96/bread.png">
+                    <img src="https://img.icons8.com/color/96/bread.png" alt="Bread" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="25" data-fat="33" data-carbs="1" data-src="https://img.icons8.com/color/96/cheese.png">
+                    <img src="https://img.icons8.com/color/96/cheese.png" alt="Cheese" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="13" data-fat="7" data-carbs="68" data-src="https://img.icons8.com/color/96/oat-flakes.png">
+                    <img src="https://img.icons8.com/color/96/oat-flakes.png" alt="Oats" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="4" data-fat="0" data-carbs="28" data-src="https://img.icons8.com/color/96/rice-bowl.png">
+                    <img src="https://img.icons8.com/color/96/rice-bowl.png" alt="Rice" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="0" data-fat="100" data-carbs="0" data-src="https://img.icons8.com/color/96/olive-oil.png">
+                    <img src="https://img.icons8.com/color/96/olive-oil.png" alt="Olive Oil" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tabletop (Bottom) -->
+        <div id="tabletop" class="flex-1 wireframe-panel rounded-lg p-4 flex flex-col dropzone relative" ondragover="event.preventDefault()" ondrop="handleDrop(event, this)">
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Tabletop</h2>
+             <!-- Dropped items on the table will go here -->
+        </div>
+    </div>
+
+    <!-- Right Panels -->
+    <div class="flex flex-col w-1/5 gap-4">
+        <!-- Fridge (Top) -->
+        <div class="flex-1 wireframe-panel rounded-lg p-4 flex flex-col">
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Fridge</h2>
+            <div id="fridge-content" class="flex-grow flex flex-wrap items-center justify-center p-2 overflow-hidden">
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="27" data-fat="19" data-carbs="0" data-src="https://img.icons8.com/color/96/steak.png">
+                    <img src="https://img.icons8.com/color/96/steak.png" alt="Steak" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="3" data-fat="0" data-carbs="7" data-src="https://img.icons8.com/color/96/broccoli.png">
+                    <img src="https://img.icons8.com/color/96/broccoli.png" alt="Broccoli" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="13" data-fat="11" data-carbs="1" data-src="https://img.icons8.com/color/96/eggs.png">
+                    <img src="https://img.icons8.com/color/96/eggs.png" alt="Eggs" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="3" data-fat="4" data-carbs="5" data-src="https://img.icons8.com/color/96/milk-bottle.png">
+                    <img src="https://img.icons8.com/color/96/milk-bottle.png" alt="Milk" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 carb-fill rounded-sm"></div>
+                    </div>
+                </div>
+                <div class="flex items-center m-2 draggable-food" draggable="true" data-protein="20" data-fat="13" data-carbs="0" data-src="https://img.icons8.com/color/96/salmon.png">
+                    <img src="https://img.icons8.com/color/96/salmon.png" alt="Salmon" class="food w-16 h-16 rounded-md">
+                    <div class="flex mt-1 flex-col-reverse space-y-px -ml-2">
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 protein-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                        <div class="w-2 h-2 fat-fill rounded-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Stack of Plates (Bottom) -->
+        <div id="plate-stack-dropzone" class="flex-1 wireframe-panel rounded-lg p-4 flex flex-col dropzone relative" ondragover="event.preventDefault()" ondrop="handleDrop(event, this)">
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Stack of Plates</h2>
+             <!-- The plate stack and dropped items will go here -->
+             <div class="dropped-items-on-plate absolute inset-0 flex flex-wrap items-center justify-center p-4 z-10"></div>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variable to hold the currently dragged item.
+    let dragged;
+
+    document.addEventListener("dragstart", e => {
+      const target = e.target.closest('.draggable-food, .plate-draggable');
+      if (!target) return;
+
+      if (target.classList.contains("draggable-food")) {
+        // If the item is from a food source panel (cabinets or fridge), clone it to place a new instance.
+        if (target.closest("#cabinets-content") || target.closest("#fridge-content")) {
+          dragged = target.cloneNode(true);
+        } else {
+          // If the item is already on a dropzone, store the original element to move it.
+          dragged = target.closest(".dropped-food");
+        }
+      } else if (target.classList.contains('plate-draggable')) {
+        dragged = target.cloneNode(true);
+        // The original plate stays in the stack, so the draggable copy is created.
+        // It will be treated as a new food item in the drop handler.
+      }
+
+      // Add a visual cue to the dropzones when dragging starts
+      document.querySelectorAll('.dropzone').forEach(dz => dz.classList.add('drag-over'));
+    });
+
+    document.addEventListener("dragend", e => {
+      // Remove the visual cue when dragging ends
+      document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('drag-over'));
+    });
+    
+    function handleDrop(e, dropzone) {
+      e.preventDefault();
+      // Only proceed if a draggable item exists.
+      if (!dragged) return;
+    
+      const foodItem = dragged;
+    
+      // If dropping on the plate stack or tabletop
+      if (dropzone.id === "tabletop") {
+        const dropContent = dropzone;
+    
+        // check if the dragged item is already on a plate stack or tabletop
+        if (foodItem.closest('#tabletop')) {
+            // If it is, simply move the existing element to the new container.
+            dropContent.appendChild(foodItem);
+        } else {
+            // This is a new item from a food source. Create a new food wrapper.
+            addDroppedFoodItem(foodItem, dropContent);
+        }
+      }
+      // Update macros regardless of which dropzone the item lands on.
+      updateMacros();
+    }
+    
+    // Creates the UI for a new food item dropped on the tabletop
+    function addDroppedFoodItem(foodItem, container) {
+      let wrapper = document.createElement("div");
+      wrapper.className = "dropped-food flex items-center justify-center m-4 z-40 relative";
+      wrapper.draggable = true;
+    
+      // Create a container for the food image and macro block stack
+      let foodAndMacros = document.createElement("div");
+      foodAndMacros.className = "flex items-end flex-col sm:flex-row";
+    
+      // Create a container for the macro block stack
+      let macroStack = document.createElement("div");
+      macroStack.className = "macro-stack flex flex-col-reverse space-y-px items-center -ml-2";
+    
+      // Get the image and data from the dragged item
+      const imgSource = foodItem.querySelector('img').src;
+      const protein = foodItem.dataset.protein;
+      const fat = foodItem.dataset.fat;
+      const carbs = foodItem.dataset.carbs;
+      
+      let foodImg = document.createElement('img');
+      foodImg.src = imgSource;
+      foodImg.alt = "Food Item";
+      foodImg.classList.add('food', 'w-20', 'h-20', 'z-20');
+      foodImg.dataset.protein = protein;
+      foodImg.dataset.fat = fat;
+      foodImg.dataset.carbs = carbs;
+      foodImg.style.width = "4rem";
+      foodImg.style.height = "4rem";
+    
+      let portionContainer = document.createElement("div");
+      portionContainer.className = "flex flex-col items-center ml-4";
+      
+      let slider = document.createElement("input");
+      slider.type = "range";
+      slider.min = 10;
+      slider.max = 500;
+      slider.value = 100; // Default to 100g.
+      slider.className = "food-slider w-16 accent-lime-500 cursor-pointer";
+      
+      let portionLabel = document.createElement("span");
+      portionLabel.className = "portion-label text-sm text-gray-700";
+    
+      let button = document.createElement("button");
+      button.textContent = "Remove";
+      button.className = "mt-2 px-2 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition duration-200";
+      button.onclick = () => {
+          wrapper.remove();
+          updateMacros();
+      };
+    
+      portionContainer.appendChild(portionLabel);
+      portionContainer.appendChild(slider);
+      portionContainer.appendChild(button);
+      
+      // Changed the structure here to put blocks right next to the image
+      const foodDisplay = document.createElement("div");
+      foodDisplay.className = "flex items-end";
+      foodDisplay.appendChild(foodImg);
+      foodDisplay.appendChild(macroStack);
+
+      wrapper.appendChild(foodDisplay);
+      wrapper.appendChild(portionContainer);
+      
+      container.appendChild(wrapper);
+    
+      // Update the portion label and macros as the slider moves.
+      slider.addEventListener("input", () => {
+        updateItemMacros(wrapper);
+      });
+      
+      // Initial update for the new item
+      updateItemMacros(wrapper);
+    }
+    
+    // Updates the macro display for a single food item
+    function updateItemMacros(wrapper) {
+        const foodImg = wrapper.querySelector("img");
+        const slider = wrapper.querySelector("input");
+        const portionLabel = wrapper.querySelector(".portion-label");
+        const macroStack = wrapper.querySelector(".macro-stack");
+    
+        if (!foodImg || !slider || !portionLabel || !macroStack) {
+            console.error("Missing required elements for updateItemMacros.");
+            return;
+        }
+
+        const weight = parseInt(slider.value);
+        portionLabel.textContent = `${weight}g`;
+        foodImg.style.width = (4 + (weight / 100) * 1) + "rem"; // Scale image based on weight
+        foodImg.style.height = (4 + (weight / 100) * 1) + "rem";
+    
+        // Calculate macros based on grams. The data attributes are per 100g.
+        const protein = (parseFloat(foodImg.dataset.protein) / 100) * weight;
+        const fat = (parseFloat(foodImg.dataset.fat) / 100) * weight;
+        const carbs = (parseFloat(foodImg.dataset.carbs) / 100) * weight;
+
+        // Clear existing blocks
+        macroStack.innerHTML = '';
+
+        // Function to add blocks to the stack
+        const addBlocks = (count, colorClass) => {
+            for (let i = 0; i < count; i++) {
+                const block = document.createElement('div');
+                block.className = `w-2 h-2 rounded-sm ${colorClass}`;
+                macroStack.appendChild(block);
+            }
+        };
+
+        // Add blocks for each macro type (1 block = 10g)
+        addBlocks(Math.round(protein / 10), 'protein-fill');
+        addBlocks(Math.round(fat / 10), 'fat-fill');
+        addBlocks(Math.round(carbs / 10), 'carb-fill');
+
+        updateMacros();
+    }
+    
+    // --- Grid generation and rendering logic ---
+    const gridRows = 25;
+    const gridCols = 3;
+    const maxMacros = 250;
+    const macroTargets = {
+      protein: 150,
+      fat: 70,
+      carbs: 250,
+    };
+    const macroColors = {
+      protein: 'protein-fill',
+      fat: 'fat-fill',
+      carbs: 'carb-fill'
+    };
+    const macroOrder = ['protein', 'fat', 'carbs'];
+
+    function generateGrid() {
+      const gridContainer = document.getElementById('nutrient-grid');
+      gridContainer.innerHTML = '';
+
+      const targetRows = {
+        protein: gridRows - Math.round((macroTargets.protein / maxMacros) * gridRows),
+        fat: gridRows - Math.round((macroTargets.fat / maxMacros) * gridRows),
+        carbs: gridRows - Math.round((macroTargets.carbs / maxMacros) * gridRows),
+      };
+
+      for (let row = 0; row < gridRows; row++) {
+        for (let col = 0; col < gridCols; col++) {
+          const cell = document.createElement('div');
+          cell.id = `cell-${row}-${col}`;
+          cell.className = 'grid-cell';
+
+          const macroName = macroOrder[col];
+          if (row === targetRows[macroName]) {
+            cell.classList.add('target-line');
+          }
+          gridContainer.appendChild(cell);
+        }
+      }
+    }
+
+    function updateGrid(macros) {
+      // Clear all colors first
+      document.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.classList.remove('protein-fill', 'fat-fill', 'carb-fill');
+      });
+
+      // Fill cells based on macro values
+      macroOrder.forEach((macro, colIndex) => {
+        const value = macros[macro];
+        const cellsToFill = Math.min(Math.round((value / maxMacros) * gridRows), gridRows);
+        
+        for (let i = 0; i < cellsToFill; i++) {
+          const rowIndex = gridRows - 1 - i;
+          const cell = document.getElementById(`cell-${rowIndex}-${colIndex}`);
+          if (cell) {
+            cell.classList.add(macroColors[macro]);
+          }
+        }
+      });
+    }
+
+    // Main update function for all macros on the tabletop
+    function updateMacros() {
+      let totalProtein = 0, totalFat = 0, totalCarbs = 0;
+
+      document.querySelectorAll(".dropped-food").forEach(df => {
+        let img = df.querySelector(".food");
+        let slider = df.querySelector(".food-slider");
+        
+        // Ensure both elements exist before trying to access properties
+        if (img && slider) {
+          let weight = parseInt(slider.value);
+          // Calculate macros based on grams. The data attributes are per 100g.
+          totalProtein += (parseFloat(img.dataset.protein) / 100) * weight;
+          totalFat += (parseFloat(img.dataset.fat) / 100) * weight;
+          totalCarbs += (parseFloat(img.dataset.carbs) / 100) * weight;
+        }
+      });
+
+      const macros = {
+        protein: totalProtein,
+        fat: totalFat,
+        carbs: totalCarbs,
+      };
+
+      // Update the text labels
+      document.getElementById('protein-total').textContent = `${Math.round(totalProtein)}g`;
+      document.getElementById('fat-total').textContent = `${Math.round(totalFat)}g`;
+      document.getElementById('carbs-total').textContent = `${Math.round(totalCarbs)}g`;
+
+      updateGrid(macros);
+    }
+
+    // Function to generate the stack of plates dynamically
+    function generatePlateStack() {
+      const plateStackContainer = document.getElementById('plate-stack-dropzone');
+      
+      const numberOfPlates = 10;
+      const verticalOffset = 10; // Pixels
+      const horizontalOffset = 5; // Pixels
+      const baseTop = 50; // A base top offset to center the stack vertically
+
+      // Start from the bottom plate (index 0) to the top (index 9)
+      for (let i = 0; i < numberOfPlates; i++) {
+        const plateDiv = document.createElement('div');
+        plateDiv.className = 'plate-draggable plate';
+        plateDiv.draggable = true;
+
+        const plateImg = document.createElement('img');
+        plateImg.src = 'https://img.icons8.com/color/96/plate.png';
+        plateImg.alt = 'Plate';
+        plateImg.className = 'w-full h-full object-contain';
+
+        // Calculate positioning for each plate
+        const top = baseTop + (i * verticalOffset * 0.5); // Halfway up the previous one
+        const left = 50 - (i * horizontalOffset) + '%';
+        
+        plateDiv.style.top = `calc(50% - ${top}px)`;
+        plateDiv.style.zIndex = i; // Adjusted z-index logic
+
+        plateDiv.appendChild(plateImg);
+        plateStackContainer.appendChild(plateDiv);
+      }
+    }
+    
+    // Initial setup on page load
+    window.onload = function() {
+      generateGrid();
+      updateMacros();
+      generatePlateStack();
+    };
+  </script>
+</body>
+</html>
