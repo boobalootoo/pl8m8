@@ -1,137 +1,138 @@
-food,protein,fat,carbs,fibre,image link
-Chicken Breast,31,3.6,0,0,https://img.icons8.com/color/96/000000/steak.png
-Salmon,20,13,0,0,https://img.icons8.com/color/96/000000/salmon.png
-Ground Beef,26,17,0,0,https://img.icons8.com/color/96/000000/steak.png
-Eggs,13,11,1,0,https://img.icons8.com/color/96/000000/eggs.png
-Greek Yogurt,10,0.4,3.6,0,https://img.icons8.com/color/96/000000/milk-bottle.png
-Tofu,8,4.8,1.9,0.9,https://img.icons8.com/color/96/000000/tofu.png
-Lentils,9,0.4,20,7.9,https://img.icons8.com/color/96/000000/lentil.png
-Quinoa,4.1,1.9,21,2.8,https://img.icons8.com/color/96/000000/quinoa.png
-Oats,13,7,68,10,https://img.icons8.com/color/96/000000/oat-flakes.png
-Brown Rice,2.6,0.9,26,1.8,https://img.icons8.com/color/96/000000/rice-bowl.png
-Sweet Potato,1.6,0.1,20,3,https://img.icons8.com/color/96/000000/sweet-potato.png
-Broccoli,2.8,0.4,6.6,2.6,https://img.icons8.com/color/96/000000/broccoli.png
-Spinach,2.9,0.4,3.6,2.2,https://img.icons8.com/color/96/000000/spinach.png
-Apple,0.3,0.2,14,2.4,https://img.icons8.com/color/96/000000/apple.png
-Banana,1.1,0.3,23,2.6,https://img.icons8.com/color/96/000000/banana.png
-Avocado,2,15,9,6.7,https://img.icons8.com/color/96/000000/avocado.png
-Almonds,21,49,22,12.2,https://img.icons8.com/color/96/000000/almonds.png
-Walnuts,15,65,14,6.7,https://img.icons8.com/color/96/000000/walnut.png
-Olive Oil,0,100,0,0,https://img.icons8.com/color/96/000000/olive-oil.png
-Cheddar Cheese,25,33,1,0,https://img.icons8.com/color/96/000000/cheese.png
-Milk (whole),3.3,3.5,4.7,0,https://img.icons8.com/color/96/000000/milk-bottle.png
-White Bread,9,4,49,3,https://img.icons8.com/color/96/000000/bread.png
-Pasta,13,1.5,74,3.2,https://img.icons8.com/color/96/000000/spaghetti.png
-Potatoes,2,0.1,17,2.2,https://img.icons8.com/color/96/000000/potato.png
-Tomatoes,0.9,0.2,3.9,1.2,https://img.icons8.com/color/96/000000/tomato.png
-Onions,1.1,0.1,9,1.7,https://img.icons8.com/color/96/000000/onion.png
-Garlic,6.4,0.5,33,2.1,https://img.icons8.com/color/96/000000/garlic.png
-Carrots,0.9,0.2,9.6,2.8,https://img.icons8.com/color/96/000000/carrot.png
-Cucumbers,0.7,0.1,3.6,0.5,https://img.icons8.com/color/96/000000/cucumber.png
-Bell Peppers,1,0.3,6,2.1,https://img.icons8.com/color/96/000000/bell-pepper.png
-Mushrooms,3.1,0.3,3.3,1,https://img.icons8.com/color/96/000000/mushroom.png
-Yogurt (plain),5,0.4,7.8,0,https://img.icons8.com/color/96/000000/yogurt.png
-Cottage Cheese,11,4.3,3.4,0,https://img.icons8.com/color/96/000000/cottage-cheese.png
-Shrimp,24,0.3,0.2,0,https://img.icons8.com/color/96/000000/shrimp.png
-Tuna,25,1,0,0,https://img.icons8.com/color/96/000000/tuna.png
-Sardines,25,11,0,0,https://img.icons8.com/color/96/000000/sardines.png
-Pork Loin,29,8,0,0,https://img.icons8.com/color/96/000000/pork-loin.png
-Turkey Breast,29,1.7,0,0,https://img.icons8.com/color/96/000000/turkey.png
-Pecans,9,72,14,9.6,https://img.icons8.com/color/96/000000/pecans.png
-Peanuts,26,49,16,8.5,https://img.icons8.com/color/96/000000/peanuts.png
-Sunflower Seeds,21,51,20,8.6,https://img.icons8.com/color/96/000000/sunflower-seeds.png
-Pumpkin Seeds,30,49,15,6,https://img.icons8.com/color/96/000000/pumpkin-seeds.png
-Soybeans,36,20,30,17.5,https://img.icons8.com/color/96/000000/soybean.png
-Black Beans,21,1.4,62,15.5,https://img.icons8.com/color/96/000000/black-beans.png
-Kidney Beans,24,0.8,60,15,https://img.icons8.com/color/96/000000/kidney-beans.png
-Chickpeas,20,6,61,17,https://img.icons8.com/color/96/000000/chickpeas.png
-Corn,3.3,1.2,21,2.4,https://img.icons8.com/color/96/000000/corn.png
-Green Peas,5.4,0.4,14,5.1,https://img.icons8.com/color/96/000000/peas.png
-Cauliflower,1.9,0.3,5,2,https://img.icons8.com/color/96/000000/cauliflower.png
-Cabbage,1.3,0.1,5.8,2.5,https://img.icons8.com/color/96/000000/cabbage.png
-Lettuce,1.4,0.2,2.9,1.3,https://img.icons8.com/color/96/000000/lettuce.png
-Asparagus,2.4,0.2,3.9,2.1,https://img.icons8.com/color/96/000000/asparagus.png
-Celery,0.7,0.2,3,1.6,https://img.icons8.com/color/96/000000/celery.png
-Zucchini,1.2,0.3,3.1,1,https://img.icons8.com/color/96/000000/zucchini.png
-Onion,1.1,0.1,9.3,1.7,https://img.icons8.com/color/96/000000/onion.png
-Garlic,6.4,0.5,33.1,2.1,https://img.icons8.com/color/96/000000/garlic.png
-Ginger,1.8,0.7,17.8,2,https://img.icons8.com/color/96/000000/ginger.png
-Grapes,0.6,0.3,18,0.9,https://img.icons8.com/color/96/000000/grapes.png
-Strawberries,0.7,0.3,7.7,2,https://img.icons8.com/color/96/000000/strawberry.png
-Blueberries,0.7,0.3,14,2.4,https://img.icons8.com/color/96/000000/blueberry.png
-Oranges,0.9,0.1,12,2.4,https://img.icons8.com/color/96/000000/orange.png
-Lemons,1.1,0.3,9,2.8,https://img.icons8.com/color/96/000000/lemon.png
-Pears,0.4,0.1,15,3.1,https://img.icons8.com/color/96/000000/pear.png
-Peaches,0.9,0.3,10,1.5,https://img.icons8.com/color/96/000000/peach.png
-Plums,0.7,0.3,11,1.4,https://img.icons8.com/color/96/000000/plum.png
-Cherries,1,0.3,16,2.1,https://img.icons8.com/color/96/000000/cherry.png
-Watermelon,0.6,0.2,7.6,0.4,https://img.icons8.com/color/96/000000/watermelon.png
-Cantaloupe,0.8,0.2,8.2,0.9,https://img.icons8.com/color/96/000000/melon.png
-Pineapple,0.5,0.1,13,1.4,https://img.icons8.com/color/96/000000/pineapple.png
-Mangoes,0.8,0.4,15,1.6,https://img.icons8.com/color/96/000000/mango.png
-Kiwi,1.1,0.5,15,3,https://img.icons8.com/color/96/000000/kiwi.png
-Dates,2.5,0.4,75,6.7,https://img.icons8.com/color/96/000000/date-fruit.png
-Raisins,3.1,0.5,79,3.7,https://img.icons8.com/color/96/000000/raisins.png
-Figs,3.3,0.9,64,9.8,https://img.icons8.com/color/96/000000/fig.png
-Prunes,2.2,0.4,64,7.1,https://img.icons8.com/color/96/000000/prune.png
-Apricots (dried),3.4,0.5,63,7.3,https://img.icons8.com/color/96/000000/apricot.png
-Coconut,3.3,33,15,9,https://img.icons8.com/color/96/000000/coconut.png
-Pistachios,20,45,28,10.6,https://img.icons8.com/color/96/000000/pistachio.png
-Cashews,18,44,30,3.3,https://img.icons8.com/color/96/000000/cashew.png
-Macadamia Nuts,7.9,76,14,8.6,https://img.icons8.com/color/96/000000/macadamia.png
-Chia Seeds,17,31,42,34.4,https://img.icons8.com/color/96/000000/chia-seed.png
-Flax Seeds,18,42,29,27.3,https://img.icons8.com/color/96/000000/flax-seed.png
-Hemp Seeds,31,48,8.8,4,https://img.icons8.com/color/96/000000/hemp-seed.png
-Honey,0.3,0,82,0,https://img.icons8.com/color/96/000000/honey.png
-Maple Syrup,0,0.2,67,0,https://img.icons8.com/color/96/000000/maple-syrup.png
-Agave Nectar,0,0,76,0,https://img.icons8.com/color/96/000000/agave.png
-Sugar,0,0,100,0,https://img.icons8.com/color/96/000000/sugar-bowl.png
-Salt,0,0,0,0,https://img.icons8.com/color/96/000000/salt.png
-Pepper,10.4,3.3,64.8,25.3,https://img.icons8.com/color/96/000000/pepper.png
-Cinnamon,4,1.2,81,53,https://img.icons8.com/color/96/000000/cinnamon.png
-Nutmeg,5.8,36,49,20.8,https://img.icons8.com/color/96/000000/nutmeg.png
-Oregano,9,4.3,69,42.5,https://img.icons8.com/color/96/000000/oregano.png
-Basil,3.2,0.6,2.8,1.6,https://img.icons8.com/color/96/000000/basil.png
-Thyme,5.6,1.7,24.4,14,https://img.icons8.com/color/96/000000/thyme.png
-Rosemary,3.3,1.7,20.7,14,https://img.icons8.com/color/96/000000/rosemary.png
-Bay Leaf,7.6,8.4,75,26.3,https://img.icons8.com/color/96/000000/bay-leaf.png
-Sage,10.6,11.6,60.7,40.3,https://img.icons8.com/color/96/000000/sage.png
-Cilantro,2.3,0.5,3.7,2.8,https://img.icons8.com/color/96/000000/cilantro.png
-Parsley,3,0.8,6,3.3,https://img.icons8.com/color/96/000000/parsley.png
-Mint,3.8,0.7,8,6.8,https://img.icons8.com/color/96/000000/mint.png
-Dill,3.5,1.1,7,2.1,https://img.icons8.com/color/96/000000/dill.png
-Chives,3.3,0.7,4.4,2.5,https://img.icons8.com/color/96/000000/chives.png
-Paprika,14,13,54,35,https://img.icons8.com/color/96/000000/paprika.png
-Cumin,18,22,44,10.5,https://img.icons8.com/color/96/000000/cumin.png
-Turmeric,8,10,65,21,https://img.icons8.com/color/96/000000/turmeric.png
-Nutritional Yeast,50,5,37,20,https://img.icons8.com/color/96/000000/nutritional-yeast.png
-Cereal,7.9,2.8,75,3.7,https://img.icons8.com/color/96/000000/cereal.png
-Pancake Mix,8.1,3.4,69,3.5,https://img.icons8.com/color/96/000000/pancake.png
-Flour,10,1.2,76,2.7,https://img.icons8.com/color/96/000000/flour.png
-Butter,0.9,81,0.1,0,https://img.icons8.com/color/96/000000/butter.png
-Margarine,0.3,81,0.1,0,https://img.icons8.com/color/96/000000/margarine.png
-Mayonnaise,0.8,79,1.1,0,https://img.icons8.com/color/96/000000/mayonnaise.png
-Ketchup,1.1,0.3,24,1.1,https://img.icons8.com/color/96/000000/ketchup.png
-Mustard,5.7,4.8,6.6,3.8,https://img.icons8.com/color/96/000000/mustard.png
-Soy Sauce,8,0,5,0,https://img.icons8.com/color/96/000000/soy-sauce.png
-Vinegar,0.1,0,0.9,0,https://img.icons8.com/color/96/000000/vinegar.png
-Oat Milk,1,1.5,10,0.5,https://img.icons8.com/color/96/000000/oat-milk.png
-Almond Milk,0.4,1.1,1.5,0.3,https://img.icons8.com/color/96/000000/almond-milk.png
-Coconut Milk,2.3,24,5.5,2.2,https://img.icons8.com/color/96/000000/coconut-milk.png
-Orange Juice,0.7,0.1,10,0.2,https://img.icons8.com/color/96/000000/orange-juice.png
-Apple Juice,0.1,0.1,11,0.1,https://img.icons8.com/color/96/000000/apple-juice.png
-Coffee,0.1,0.1,0.4,0.1,https://img.icons8.com/color/96/000000/coffee.png
-Tea,0.2,0,0.3,0,https://img.icons8.com/color/96/000000/tea.png
-Green Tea,0.1,0,0.1,0,https://img.icons8.com/color/96/000000/green-tea.png
-Soda,0,0,10,0,https://img.icons8.com/color/96/000000/soda.png
-Cola,0,0,10,0,https://img.icons8.com/color/96/000000/cola.png
-Dark Chocolate,8,43,46,11,https://img.icons8.com/color/96/000000/dark-chocolate.png
-Milk Chocolate,8,30,59,3.4,https://img.icons8.com/color/96/000000/milk-chocolate.png
-Candy,0.1,0.1,95,0,https://img.icons8.com/color/96/000000/candy.png
-Ice Cream,4,11,24,0.7,https://img.icons8.com/color/96/000000/ice-cream.png
-Cookies,4.5,21,68,2.5,https://img.icons8.com/color/96/000000/cookie.png
-Cake,5,15,60,1,https://img.icons8.com/color/96/000000/cake.png
-Donuts,6.1,20,55,1.7,https://img.icons8.com/color/96/000000/donut.png
-Pizza,12,10,26,1.8,https://img.icons8.com/color/96/000000/pizza.png
-Burger,15,10,21,1.5,https://img.icons8.com/color/96/000000/burger.png
-Fries,3.4,15,41,3.8,https://img.icons8.com/color/96/000000/french-fries.png
+food,protein,fat,carbs,fibre,sugar,image link
+Chicken Breast,31,3.6,0,0,0,https://img.icons8.com/color/96/000000/steak.png
+Salmon,20,13,0,0,0,https://img.icons8.com/color/96/000000/salmon.png
+Ground Beef,26,17,0,0,0,https://img.icons8.com/color/96/000000/steak.png
+Eggs,13,11,1,0,0.5,https://img.icons8.com/color/96/000000/eggs.png
+Greek Yogurt,10,0.4,3.6,0,3.6,https://img.icons8.com/color/96/000000/milk-bottle.png
+Tofu,8,4.8,1.9,0.9,0.5,https://img.icons8.com/color/96/000000/tofu.png
+Lentils,9,0.4,20,7.9,1.8,https://img.icons8.com/color/96/000000/lentil.png
+Quinoa,4.1,1.9,21,2.8,1.3,https://img.icons8.com/color/96/000000/quinoa.png
+Oats,13,7,68,10,1.1,https://img.icons8.com/color/96/000000/oat-flakes.png
+Brown Rice,2.6,0.9,26,1.8,0.3,https://img.icons8.com/color/96/000000/rice-bowl.png
+Sweet Potato,1.6,0.1,20,3,4.2,https://img.icons8.com/color/96/000000/sweet-potato.png
+Broccoli,2.8,0.4,6.6,2.6,1.7,https://img.icons8.com/color/96/000000/broccoli.png
+Spinach,2.9,0.4,3.6,2.2,0.4,https://img.icons8.com/color/96/000000/spinach.png
+Apple,0.3,0.2,14,2.4,10.4,https://img.icons8.com/color/96/000000/apple.png
+Banana,1.1,0.3,23,2.6,12.2,https://img.icons8.com/color/96/000000/banana.png
+Avocado,2,15,9,6.7,0.7,https://img.icons8.com/color/96/000000/avocado.png
+Almonds,21,49,22,12.2,4.6,https://img.icons8.com/color/96/000000/almonds.png
+Walnuts,15,65,14,6.7,2.6,https://img.icons8.com/color/96/000000/walnut.png
+Olive Oil,0,100,0,0,0,https://img.icons8.com/color/96/000000/olive-oil.png
+Cheddar Cheese,25,33,1,0,0.5,https://img.icons8.com/color/96/000000/cheese.png
+Milk (whole),3.3,3.5,4.7,0,4.7,https://img.icons8.com/color/96/000000/milk-bottle.png
+White Bread,9,4,49,3,5.1,https://img.icons8.com/color/96/000000/bread.png
+Pasta,13,1.5,74,3.2,1.3,https://img.icons8.com/color/96/000000/spaghetti.png
+Potatoes,2,0.1,17,2.2,0.8,https://img.icons8.com/color/96/000000/potato.png
+Tomatoes,0.9,0.2,3.9,1.2,2.6,https://img.icons8.com/color/96/000000/tomato.png
+Onions,1.1,0.1,9,1.7,4.2,https://img.icons8.com/color/96/000000/onion.png
+Garlic,6.4,0.5,33,2.1,1.0,https://img.icons8.com/color/96/000000/garlic.png
+Carrots,0.9,0.2,9.6,2.8,4.7,https://img.icons8.com/color/96/000000/carrot.png
+Cucumbers,0.7,0.1,3.6,0.5,1.7,https://img.icons8.com/color/96/000000/cucumber.png
+Bell Peppers,1,0.3,6,2.1,4.2,https://img.icons8.com/color/96/000000/bell-pepper.png
+Mushrooms,3.1,0.3,3.3,1,1.4,https://img.icons8.com/color/96/000000/mushroom.png
+Yogurt (plain),5,0.4,7.8,0,3.6,https://img.icons8.com/color/96/000000/yogurt.png
+Cottage Cheese,11,4.3,3.4,0,3.4,https://img.icons8.com/color/96/000000/cottage-cheese.png
+Shrimp,24,0.3,0.2,0,0.2,https://img.icons8.com/color/96/000000/shrimp.png
+Tuna,25,1,0,0,0,https://img.icons8.com/color/96/000000/tuna.png
+Sardines,25,11,0,0,0,https://img.icons8.com/color/96/000000/sardines.png
+Pork Loin,29,8,0,0,0,https://img.icons8.com/color/96/000000/pork-loin.png
+Turkey Breast,29,1.7,0,0,0,https://img.icons8.com/color/96/000000/turkey.png
+Pecans,9,72,14,9.6,3.9,https://img.icons8.com/color/96/000000/pecans.png
+Peanuts,26,49,16,8.5,4.7,https://img.icons8.com/color/96/000000/peanuts.png
+Sunflower Seeds,21,51,20,8.6,2.6,https://img.icons8.com/color/96/000000/sunflower-seeds.png
+Pumpkin Seeds,30,49,15,6,1.2,https://img.icons8.com/color/96/000000/pumpkin-seeds.png
+Soybeans,36,20,30,17.5,7.3,https://img.icons8.com/color/96/000000/soybean.png
+Black Beans,21,1.4,62,15.5,0.3,https://img.icons8.com/color/96/000000/black-beans.png
+Kidney Beans,24,0.8,60,15,0.3,https://img.icons8.com/color/96/000000/kidney-beans.png
+Chickpeas,20,6,61,17,11,https://img.icons8.com/color/96/000000/chickpeas.png
+Corn,3.3,1.2,21,2.4,0.6,https://img.icons8.com/color/96/000000/corn.png
+Green Peas,5.4,0.4,14,5.1,5.7,https://img.icons8.com/color/96/000000/peas.png
+Cauliflower,1.9,0.3,5,2,1.9,https://img.icons8.com/color/96/000000/cauliflower.png
+Cabbage,1.3,0.1,5.8,2.5,3.2,https://img.icons8.com/color/96/000000/cabbage.png
+Lettuce,1.4,0.2,2.9,1.3,0.8,https://img.icons8.com/color/96/000000/lettuce.png
+Asparagus,2.4,0.2,3.9,2.1,2.5,https://img.icons8.com/color/96/000000/asparagus.png
+Celery,0.7,0.2,3,1.6,1.4,https://img.icons8.com/color/96/000000/celery.png
+Zucchini,1.2,0.3,3.1,1,2.5,https://img.icons8.com/color/96/000000/zucchini.png
+Onion,1.1,0.1,9.3,1.7,4.2,https://img.icons8.com/color/96/000000/onion.png
+Garlic,6.4,0.5,33.1,2.1,1.0,https://img.icons8.com/color/96/000000/garlic.png
+Ginger,1.8,0.7,17.8,2,1.7,https://img.icons8.com/color/96/000000/ginger.png
+Grapes,0.6,0.3,18,0.9,15.5,https://img.icons8.com/color/96/000000/grapes.png
+Strawberries,0.7,0.3,7.7,2,4.9,https://img.icons8.com/color/96/000000/strawberry.png
+Blueberries,0.7,0.3,14,2.4,10,https://img.icons8.com/color/96/000000/blueberry.png
+Oranges,0.9,0.1,12,2.4,9.4,https://img.icons8.com/color/96/000000/orange.png
+Lemons,1.1,0.3,9,2.8,2.5,https://img.icons8.com/color/96/000000/lemon.png
+Pears,0.4,0.1,15,3.1,9.8,https://img.icons8.com/color/96/000000/pear.png
+Peaches,0.9,0.3,10,1.5,8.4,https://img.icons8.com/color/96/000000/peach.png
+Plums,0.7,0.3,11,1.4,9.9,https://img.icons8.com/color/96/000000/plum.png
+Cherries,1,0.3,16,2.1,12.8,https://img.icons8.com/color/96/000000/cherry.png
+Watermelon,0.6,0.2,7.6,0.4,6.2,https://img.icons8.com/color/96/000000/watermelon.png
+Cantaloupe,0.8,0.2,8.2,0.9,7.9,https://img.icons8.com/color/96/000000/melon.png
+Pineapple,0.5,0.1,13,1.4,9.9,https://img.icons8.com/color/96/000000/pineapple.png
+Mangoes,0.8,0.4,15,1.6,13.7,https://img.icons8.com/color/96/000000/mango.png
+Kiwi,1.1,0.5,15,3,9,https://img.icons8.com/color/96/000000/kiwi.png
+Dates,2.5,0.4,75,6.7,66.5,https://img.icons8.com/color/96/000000/date-fruit.png
+Raisins,3.1,0.5,79,3.7,59.2,https://img.icons8.com/color/96/000000/raisins.png
+Figs,3.3,0.9,64,9.8,47.9,https://img.icons8.com/color/96/000000/fig.png
+Prunes,2.2,0.4,64,7.1,38.1,https://img.icons8.com/color/96/000000/prune.png
+Apricots (dried),3.4,0.5,63,7.3,53.4,https://img.icons8.com/color/96/000000/apricot.png
+Coconut,3.3,33,15,9,6.2,https://img.icons8.com/color/96/000000/coconut.png
+Pistachios,20,45,28,10.6,7.7,https://img.icons8.com/color/96/000000/pistachio.png
+Cashews,18,44,30,3.3,6,https://img.icons8.com/color/96/000000/cashew.png
+Macadamia Nuts,7.9,76,14,8.6,4.6,https://img.icons8.com/color/96/000000/macadamia.png
+Chia Seeds,17,31,42,34.4,0,https://img.icons8.com/color/96/000000/chia-seed.png
+Flax Seeds,18,42,29,27.3,1.6,https://img.icons8.com/color/96/000000/flax-seed.png
+Hemp Seeds,31,48,8.8,4,1.5,https://img.icons8.com/color/96/000000/hemp-seed.png
+Honey,0.3,0,82,0,82.1,https://img.icons8.com/color/96/000000/honey.png
+Maple Syrup,0,0.2,67,0,67,https://img.icons8.com/color/96/000000/maple-syrup.png
+Agave Nectar,0,0,76,0,67.8,https://img.icons8.com/color/96/000000/agave.png
+Sugar,0,0,100,0,100,https://img.icons8.com/color/96/000000/sugar-bowl.png
+Salt,0,0,0,0,0,https://img.icons8.com/color/96/000000/salt.png
+Pepper,10.4,3.3,64.8,25.3,0.6,https://img.icons8.com/color/96/000000/pepper.png
+Cinnamon,4,1.2,81,53,2.2,https://img.icons8.com/color/96/000000/cinnamon.png
+Nutmeg,5.8,36,49,20.8,2.9,https://img.icons8.com/color/96/000000/nutmeg.png
+Oregano,9,4.3,69,42.5,2.1,https://img.icons8.com/color/96/000000/oregano.png
+Basil,3.2,0.6,2.8,1.6,0.3,https://img.icons8.com/color/96/000000/basil.png
+Thyme,5.6,1.7,24.4,14,0.3,https://img.icons8.com/color/96/000000/thyme.png
+Rosemary,3.3,1.7,20.7,14,0.3,https://img.icons8.com/color/96/000000/rosemary.png
+Bay Leaf,7.6,8.4,75,26.3,0.3,https://img.icons8.com/color/96/000000/bay-leaf.png
+Sage,10.6,11.6,60.7,40.3,1.7,https://img.icons8.com/color/96/000000/sage.png
+Cilantro,2.3,0.5,3.7,2.8,0.9,https://img.icons8.com/color/96/000000/cilantro.png
+Parsley,3,0.8,6,3.3,0.9,https://img.icons8.com/color/96/000000/parsley.png
+Mint,3.8,0.7,8,6.8,0.7,https://img.icons8.com/color/96/000000/mint.png
+Dill,3.5,1.1,7,2.1,0,https://img.icons8.com/color/96/000000/dill.png
+Chives,3.3,0.7,4.4,2.5,2.7,https://img.icons8.com/color/96/000000/chives.png
+Paprika,14,13,54,35,10.3,https://img.icons8.com/color/96/000000/paprika.png
+Cumin,18,22,44,10.5,2.3,https://img.icons8.com/color/96/000000/cumin.png
+Turmeric,8,10,65,21,3.2,https://img.icons8.com/color/96/000000/turmeric.png
+Nutritional Yeast,50,5,37,20,0,https://img.icons8.com/color/96/000000/nutritional-yeast.png
+Cereal,7.9,2.8,75,3.7,25,https://img.icons8.com/color/96/000000/cereal.png
+Pancake Mix,8.1,3.4,69,3.5,20.7,https://img.icons8.com/color/96/000000/pancake.png
+Flour,10,1.2,76,2.7,0.3,https://img.icons8.com/color/96/000000/flour.png
+Butter,0.9,81,0.1,0,0.1,https://img.icons8.com/color/96/000000/butter.png
+Margarine,0.3,81,0.1,0,0,https://img.icons8.com/color/96/000000/margarine.png
+Mayonnaise,0.8,79,1.1,0,0.6,https://img.icons8.com/color/96/000000/mayonnaise.png
+Ketchup,1.1,0.3,24,1.1,22.1,https://img.icons8.com/color/96/000000/ketchup.png
+Mustard,5.7,4.8,6.6,3.8,2,https://img.icons8.com/color/96/000000/mustard.png
+Soy Sauce,8,0,5,0,0.7,https://img.icons8.com/color/96/000000/soy-sauce.png
+Vinegar,0.1,0,0.9,0,0.4,https://img.icons8.com/color/96/000000/vinegar.png
+Oat Milk,1,1.5,10,0.5,3.9,https://img.icons8.com/color/96/000000/oat-milk.png
+Almond Milk,0.4,1.1,1.5,0.3,1.3,https://img.icons8.com/color/96/000000/almond-milk.png
+Coconut Milk,2.3,24,5.5,2.2,3.3,https://img.icons8.com/color/96/000000/coconut-milk.png
+Orange Juice,0.7,0.1,10,0.2,8.4,https://img.icons8.com/color/96/000000/orange-juice.png
+Apple Juice,0.1,0.1,11,0.1,10.6,https://img.icons8.com/color/96/000000/apple-juice.png
+Coffee,0.1,0.1,0.4,0.1,0,https://img.icons8.com/color/96/000000/coffee.png
+Tea,0.2,0,0.3,0,0,https://img.icons8.com/color/96/000000/tea.png
+Green Tea,0.1,0,0.1,0,0,https://img.icons8.com/color/96/000000/green-tea.png
+Soda,0,0,10,0,10,https://img.icons8.com/color/96/000000/soda.png
+Cola,0,0,10,0,10,https://img.icons8.com/color/96/000000/cola.png
+Dark Chocolate,8,43,46,11,24,https://img.icons8.com/color/96/000000/dark-chocolate.png
+Milk Chocolate,8,30,59,3.4,52,https://img.icons8.com/color/96/000000/milk-chocolate.png
+Candy,0.1,0.1,95,0,94.9,https://img.icons8.com/color/96/000000/candy.png
+Ice Cream,4,11,24,0.7,21,https://img.icons8.com/color/96/000000/ice-cream.png
+Cookies,4.5,21,68,2.5,43,https://img.icons8.com/color/96/000000/cookie.png
+Cake,5,15,60,1,38,https://img.icons8.com/color/96/000000/cake.png
+Donuts,6.1,20,55,1.7,28.8,https://img.icons8.com/color/96/000000/donut.png
+Pizza,12,10,26,1.8,2.7,https://img.icons8.com/color/96/000000/pizza.png
+Burger,15,10,21,1.5,2.1,https://img.icons8.com/color/96/000000/burger.png
+Fries,3.4,15,41,3.8,0.3,https://img.icons8.com/color/96/000000/french-fries.png
+
