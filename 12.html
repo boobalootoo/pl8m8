@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balanced Meal Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .protein-fill { background-color: #ef4444; }
+    .fat-fill { background-color: #3b82f6; }
+    .carb-fill { background-color: #facc15; }
+    .fibre-fill { background-color: #8b5d33; }
+    .sugar-fill { background-color: #ffffff; border: 1px solid #d1d5db; }
+    .wireframe-panel { background-color: #f3f4f6; border: 1px solid #d1d5db; }
+    .draggable-food { cursor: grab; transition: transform 0.2s ease-in-out; }
+    .draggable-food:hover { transform: scale(1.1); }
+    .dropzone { border: 2px dashed #9ca3af; transition: border-color 0.2s ease-in-out; }
+    .dropzone.drag-over { border-color: #4b5563; }
+    
+    .bucket {
+      position: relative;
+      width: 20px;
+      border: 2px solid #374151;
+      background: #e5e7eb;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      margin: 0;
+      overflow: visible;
+    }
+    .macro-block { width: 10px; height: 10px; margin: 1px 0; border: 1px solid #374151; }
+    .macro-column { display: flex; flex-direction: column-reverse; align-items: center; margin: 2px 0; }
+    .excess-area {
+      position: absolute;
+      bottom: -1px;
+      transform: translateY(100%);
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .dropped-food-wrapper {
+        position: absolute;
+        z-index: 10;
+        cursor: grab;
+        display: inline-block;
+    }
+
+   #tabletop {
+      background-color: #8B4513; /* brown color */
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans">
+  
+  <div class="flex flex-col md:flex-row w-full max-w-7xl md:h-[80vh] gap-4 p-4 rounded-lg shadow-lg bg-white">
+    
+    <!-- Nutrition Buckets & Summary Section -->
+    <div class="flex flex-col w-full md:w-1/5 gap-4">
+        <div class="flex-1 wireframe-panel rounded-lg p-4 items-center flex flex-col">
+            <div class="flex flex-grow justify-evenly items-stretch w-full mb-4">
+                <div class="flex flex-col items-center relative">
+                  <div class="bucket h-[180px]" id="proteinBucket"></div>
+                  <div class="excess-area" id="proteinExcess"></div>
+                  <span class="text-gray-600 mt-2 text-sm font-semibold">Protein</span>
+                </div>
+                <div class="flex flex-col items-center relative">
+                  <div class="bucket h-[84px]" id="fatBucket"></div>
+                  <div class="excess-area" id="fatExcess"></div>
+                  <span class="text-gray-600 mt-2 text-sm font-semibold">Fat</span>
+                </div>
+                <div class="flex flex-col items-center relative">
+                  <div class="bucket h-[300px]" id="carbBucket"></div>
+                  <div class="excess-area" id="carbExcess"></div>
+                  <span class="text-gray-600 mt-2 text-sm font-semibold">Carbs</span>
+                </div>
+                <div class="flex flex-col items-center relative">
+                  <div class="bucket h-[120px]" id="fibreBucket"></div>
+                  <div class="excess-area" id="fibreExcess"></div>
+                  <span class="text-gray-600 mt-2 text-sm font-semibold">Fibre</span>
+                </div>
+                <div class="flex flex-col items-center relative">
+                  <div class="bucket h-[84px]" id="sugarBucket"></div>
+                  <div class="excess-area" id="sugarExcess"></div>
+                  <span class="text-gray-600 mt-2 text-sm font-semibold">Sugar</span>
+                </div>
+            </div>
+            <span class="text-gray-500 text-xs text-center">Each block represents 10g</span>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="flex-1 wireframe-panel rounded-lg p-4 overflow-auto" id="summarySection">
+            <h3 class="text-lg font-bold text-gray-700 mb-2">Current Meal</h3>
+            <ul id="summaryList" class="list-disc list-inside text-gray-600 text-sm">
+                <li id="no-foods-message">No foods on the table yet.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col gap-4 w-full">
+      <div class="flex-grow wireframe-panel rounded-lg p-4 dropzone relative" id="tabletop" ondragover="event.preventDefault()" ondrop="handleDrop(event, this)">
+      </div>
+    </div>
+    
+    <!-- Combined Food Tray -->
+    <div class="flex flex-col w-full md:w-1/5 gap-4">
+      <div class="flex-1 wireframe-panel rounded-lg p-4 flex flex-col">
+        <div id="food-tray" class="flex-grow flex flex-wrap items-center justify-center p-2 overflow-hidden">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let dragged;
+    const CSV_URL = 'https://raw.githubusercontent.com/boobalootoo/pl8m8/main/info.csv';
+    const FOOD_TRAY_ID = 'food-tray';
+    let draggedElement = null;
+    let dragOffsetX = 0, dragOffsetY = 0;
+
+    // Asynchronously fetches and parses the CSV data
+    async function fetchAndPopulateFoods() {
+      try {
+        const response = await fetch(CSV_URL);
+        const text = await response.text();
+        const rows = text.trim().split('\n').slice(1);
+        
+        const foodTray = document.getElementById(FOOD_TRAY_ID);
+        
+        rows.forEach(row => {
+          const columns = row.split(',');
+          const [foodName, protein, fat, carbs, fibre, imageLink] = columns.map(col => col.trim());
+          const sugar = (Math.random() * (parseFloat(carbs) * 0.5)).toFixed(2); // Generate a random sugar value
+          
+          if (foodName && protein && fat && carbs && imageLink) {
+            const foodItem = createFoodElement(foodName, protein, fat, carbs, fibre, sugar, imageLink);
+            foodTray.appendChild(foodItem);
+          }
+        });
+        
+        initializeFoodItems();
+        updateMacros();
+        updateSummary();
+      } catch (error) {
+        console.error("Failed to fetch or parse food data:", error);
+        const foodTray = document.getElementById(FOOD_TRAY_ID);
+        foodTray.innerHTML = '<p class="text-center text-red-500">Failed to load food data. Please check the URL.</p>';
+      }
+    }
+
+    // Creates a draggable food item element with data attributes from the CSV
+    function createFoodElement(name, protein, fat, carbs, fibre, sugar, imageLink) {
+      const foodDiv = document.createElement('div');
+      foodDiv.className = "flex items-center m-2 draggable-food";
+      foodDiv.draggable = true;
+      foodDiv.dataset.name = name;
+      foodDiv.dataset.protein = protein;
+      foodDiv.dataset.fat = fat;
+      foodDiv.dataset.carbs = carbs;
+      foodDiv.dataset.fibre = fibre; // Added fibre data attribute
+      foodDiv.dataset.sugar = sugar; // Added sugar data attribute
+      foodDiv.dataset.src = imageLink;
+
+      const img = document.createElement('img');
+      img.src = imageLink;
+      img.alt = name;
+      img.className = "food w-12 h-12 rounded-md";
+
+      const macroDisplay = document.createElement('div');
+      macroDisplay.className = "macro-display ml-2 flex flex-col";
+
+      foodDiv.appendChild(img);
+      foodDiv.appendChild(macroDisplay);
+      
+      return foodDiv;
+    }
+
+    // --- Drag-and-drop logic for both mouse and touch events ---
+    document.addEventListener("dragstart", e => {
+      if (e.target.closest('.food-slider, button')) return;
+      const foodItem = e.target.closest('.draggable-food');
+      const droppedItem = e.target.closest('.dropped-food-wrapper');
+      if (foodItem) {
+        dragged = foodItem.cloneNode(true);
+        e.dataTransfer.setData('text/plain', 'food');
+      } else if (droppedItem) {
+        dragged = droppedItem;
+        e.dataTransfer.setData('text/plain', 'dropped-item');
+      } else return;
+      document.querySelectorAll('.dropzone').forEach(dz => dz.classList.add('drag-over'));
+      if (droppedItem) setTimeout(() => droppedItem.style.visibility = 'hidden', 0);
+    });
+
+    document.addEventListener("dragend", e => {
+      document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('drag-over'));
+      if (dragged && dragged.closest('#tabletop')) dragged.style.visibility = 'visible';
+      updateMacros();
+      updateSummary();
+      dragged = null;
+    });
+
+    document.getElementById(FOOD_TRAY_ID).addEventListener("touchstart", handleTouchStart);
+    document.getElementById("tabletop").addEventListener("touchstart", handleTouchStart);
+    document.getElementById("tabletop").addEventListener("touchmove", handleTouchMove);
+    document.getElementById("tabletop").addEventListener("touchend", handleTouchEnd);
+    
+    function handleTouchStart(e) {
+      const foodItem = e.target.closest('.draggable-food');
+      const droppedItem = e.target.closest('.dropped-food-wrapper');
+
+      if (e.target.closest('.food-slider, button') || (!foodItem && !droppedItem)) return;
+      e.preventDefault();
+
+      const touch = e.touches[0];
+      const targetElement = droppedItem || foodItem;
+      const rect = targetElement.getBoundingClientRect();
+      
+      draggedElement = droppedItem || addDroppedFoodItem(foodItem);
+      draggedElement.style.zIndex = '1000';
+      
+      dragOffsetX = touch.clientX - rect.left;
+      dragOffsetY = touch.clientY - rect.top;
+
+      if (!droppedItem) {
+          document.getElementById("tabletop").appendChild(draggedElement);
+      }
+    }
+
+    function handleTouchMove(e) {
+      if (!draggedElement) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const tabletop = document.getElementById('tabletop');
+      const tabletopRect = tabletop.getBoundingClientRect();
+
+      let x = touch.clientX - tabletopRect.left - dragOffsetX;
+      let y = touch.clientY - tabletopRect.top - dragOffsetY;
+
+      x = Math.max(0, Math.min(x, tabletop.clientWidth - draggedElement.offsetWidth));
+      y = Math.max(0, Math.min(y, tabletop.clientHeight - draggedElement.offsetHeight));
+
+      draggedElement.style.left = x + 'px';
+      draggedElement.style.top = y + 'px';
+    }
+
+    function handleTouchEnd(e) {
+      if (!draggedElement) return;
+      draggedElement.style.zIndex = '';
+      draggedElement = null;
+      updateMacros();
+      updateSummary();
+    }
+
+    function handleDrop(e, dropzone) {
+      e.preventDefault();
+      const dropType = e.dataTransfer.getData('text/plain');
+      const targetElement = e.target.closest('#tabletop');
+      if (!targetElement) return;
+
+      const rect = targetElement.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
+
+      if (dropType === 'food') {
+          const foodWrapper = addDroppedFoodItem(dragged);
+          foodWrapper.style.left = `${x}px`;
+          foodWrapper.style.top = `${y}px`;
+          targetElement.appendChild(foodWrapper);
+      } else if (dropType === 'dropped-item') {
+          dragged.style.left = `${x}px`;
+          dragged.style.top = `${y}px`;
+          targetElement.appendChild(dragged);
+      }
+      updateMacros();
+      updateSummary();
+    }
+
+    // --- New function to update the summary list ---
+    function updateSummary() {
+        const summaryList = document.getElementById('summaryList');
+        summaryList.innerHTML = '';
+        const droppedFoods = document.querySelectorAll(".dropped-food-wrapper");
+        
+        if (droppedFoods.length === 0) {
+            const message = document.createElement('li');
+            message.textContent = "No foods on the table yet.";
+            message.id = "no-foods-message";
+            summaryList.appendChild(message);
+        } else {
+            droppedFoods.forEach(df => {
+                const foodName = df.dataset.name;
+                const portionLabel = df.querySelector(".portion-label");
+                const portion = portionLabel ? portionLabel.textContent : "100g";
+                const listItem = document.createElement('li');
+                listItem.textContent = `${foodName}: ${portion}`;
+                summaryList.appendChild(listItem);
+            });
+        }
+    }
+
+    // --- Existing helper functions ---
+    function addDroppedFoodItem(foodItem) {
+      let wrapper = document.createElement("div");
+      wrapper.className = "dropped-food-wrapper";
+      wrapper.dataset.name = foodItem.dataset.name;
+      
+      const imgSource = foodItem.querySelector('img').src;
+      const protein = parseFloat(foodItem.dataset.protein);
+      const fat = parseFloat(foodItem.dataset.fat);
+      const carbs = parseFloat(foodItem.dataset.carbs);
+      const fibre = parseFloat(foodItem.dataset.fibre); // Added
+      const sugar = parseFloat(foodItem.dataset.sugar); // Added
+
+      let foodImg = document.createElement('img');
+      foodImg.src = imgSource;
+      foodImg.classList.add('food','w-16','h-16');
+      foodImg.dataset.protein = protein;
+      foodImg.dataset.fat = fat;
+      foodImg.dataset.carbs = carbs;
+      foodImg.dataset.fibre = fibre;
+      foodImg.dataset.sugar = sugar;
+
+      let macroDisplay = document.createElement('div');
+      macroDisplay.className = "macro-display flex flex-col ml-2";
+
+      let sliderContainer = document.createElement("div");
+      sliderContainer.className = "flex flex-col items-center ml-4";
+
+      let portionLabel = document.createElement("span");
+      portionLabel.className = "portion-label text-sm text-gray-700";
+
+      let slider = document.createElement("input");
+      slider.type="range"; slider.min=10; slider.max=500; slider.value=100;
+      slider.className="food-slider w-16 accent-lime-500 cursor-pointer";
+      slider.addEventListener("input", ()=> {
+          updateMacros();
+          updateSummary();
+          renderMacrosForFoodItem(macroDisplay, protein*(slider.value/100), fat*(slider.value/100), carbs*(slider.value/100), fibre*(slider.value/100), sugar*(slider.value/100));
+      });
+
+      let removeButton = document.createElement("button");
+      removeButton.textContent = "Remove";
+      removeButton.className = "mt-2 px-2 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition duration-200";
+      removeButton.onclick = () => { wrapper.remove(); updateMacros(); updateSummary(); };
+
+      sliderContainer.appendChild(portionLabel);
+      sliderContainer.appendChild(slider);
+      sliderContainer.appendChild(removeButton);
+
+      let innerWrapper = document.createElement("div");
+      innerWrapper.className = "flex items-center justify-center";
+      innerWrapper.appendChild(foodImg);
+      innerWrapper.appendChild(macroDisplay);
+      innerWrapper.appendChild(sliderContainer);
+
+      wrapper.appendChild(innerWrapper);
+
+      renderMacrosForFoodItem(macroDisplay, protein, fat, carbs, fibre, sugar);
+      updateMacros();
+      updateSummary();
+
+      let offsetX = 0, offsetY = 0;
+      wrapper.addEventListener("mousedown", e => {
+          if (e.target.closest('.food-slider, button')) return;
+          e.preventDefault();
+
+          const tabletop = document.getElementById('tabletop');
+          const tabletopRect = tabletop.getBoundingClientRect();
+          const wrapperRect = wrapper.getBoundingClientRect();
+
+          offsetX = e.clientX - wrapperRect.left;
+          offsetY = e.clientY - wrapperRect.top;
+
+          wrapper.style.cursor = 'grabbing';
+
+          function onMouseMove(ev) {
+              let x = ev.clientX - tabletopRect.left - offsetX;
+              let y = ev.clientY - tabletopRect.top - offsetY;
+              x = Math.max(0, Math.min(x, tabletop.clientWidth - wrapper.offsetWidth));
+              y = Math.max(0, Math.min(y, tabletop.clientHeight - wrapper.offsetHeight));
+              wrapper.style.left = x + 'px';
+              wrapper.style.top = y + 'px';
+          }
+
+          function onMouseUp() {
+              document.removeEventListener("mousemove", onMouseMove);
+              document.removeEventListener("mouseup", onMouseUp);
+              wrapper.style.cursor = 'grab';
+              updateMacros();
+              updateSummary();
+          }
+
+          document.addEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onMouseUp);
+      });
+
+      return wrapper;
+    }
+
+    function renderMacrosForFoodItem(macroDisplayElement, p, f, c, fi, s){
+      macroDisplayElement.innerHTML='';
+      const macros=[{value:p,color:'protein-fill'},{value:f,color:'fat-fill'},{value:c,color:'carb-fill'}, {value:fi, color:'fibre-fill'}, {value:s, color:'sugar-fill'}];
+      macros.forEach(macro=>{
+        const row=document.createElement('div');
+        row.className='macro-column';
+        const blockCount=Math.floor(macro.value/10);
+        for(let i=0;i<blockCount;i++){
+          const block=document.createElement("div");
+          block.className=`macro-block ${macro.color}`;
+          row.appendChild(block);
+        }
+        macroDisplayElement.appendChild(row);
+      });
+    }
+
+    function updateMacros(){
+      let totalProtein=0,totalFat=0,totalCarbs=0,totalFibre=0,totalSugar=0;
+      document.querySelectorAll(".dropped-food-wrapper").forEach(df=>{
+        let img=df.querySelector(".food");
+        let slider=df.querySelector(".food-slider");
+        if(img&&slider){
+          let w=parseInt(slider.value);
+          let portionLabel=df.querySelector(".portion-label");
+          if(portionLabel) portionLabel.textContent=`${w}g`;
+          totalProtein+=(parseFloat(img.dataset.protein)/100)*w;
+          totalFat+=(parseFloat(img.dataset.fat)/100)*w;
+          totalCarbs+=(parseFloat(img.dataset.carbs)/100)*w;
+          totalFibre+=(parseFloat(img.dataset.fibre)/100)*w;
+          totalSugar+=(parseFloat(img.dataset.sugar)/100)*w;
+        }
+      });
+      renderBuckets(totalProtein,totalFat,totalCarbs,totalFibre,totalSugar);
+    }
+
+    function renderBuckets(p,f,c,fi,s){
+      renderBucket("proteinBucket","proteinExcess",p,"protein-fill",150);
+      renderBucket("fatBucket","fatExcess",f,"fat-fill",70);
+      renderBucket("carbBucket","carbExcess",c,"carb-fill",250);
+      renderBucket("fibreBucket","fibreExcess",fi,"fibre-fill",100);
+      renderBucket("sugarBucket","sugarExcess",s,"sugar-fill",70);
+    }
+
+    function renderBucket(bucketId,excessId,value,colorClass,target){
+      const bucket=document.getElementById(bucketId);
+      const excess=document.getElementById(excessId);
+      if (!bucket || !excess) return;
+      bucket.querySelectorAll(".macro-block").forEach(el=>el.remove());
+      excess.querySelectorAll(".macro-block").forEach(el=>el.remove());
+      let blocks=Math.floor(value/10);
+      let maxBlocks=Math.floor(target/10);
+      for(let i=0;i<blocks;i++){
+        const block=document.createElement("div");
+        block.className=`macro-block ${colorClass}`;
+        if(i<maxBlocks){ bucket.appendChild(block);} else{ excess.appendChild(block);}
+      }
+    }
+
+    function initializeFoodItems(){
+      document.querySelectorAll('.draggable-food').forEach(foodItem=>{
+        const protein=parseFloat(foodItem.dataset.protein);
+        const fat=parseFloat(foodItem.dataset.fat);
+        const carbs=parseFloat(foodItem.dataset.carbs);
+        const fibre=parseFloat(foodItem.dataset.fibre);
+        const sugar=parseFloat(foodItem.dataset.sugar);
+        renderMacrosForFoodItem(foodItem.querySelector('.macro-display'),protein,fat,carbs,fibre,sugar);
+      });
+    }
+
+    window.onload = () => {
+      fetchAndPopulateFoods();
+    }
+  </script>
+</body>
+  </html>
